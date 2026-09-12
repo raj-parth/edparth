@@ -5,6 +5,7 @@ import { Logo } from '../Logo';
 import { verifyAdminCredentials } from '../../utils/auth';
 import { loginStudentWithFirebase, registerStudentWithFirebase } from '../../services/firebase';
 import type { ClassGrade, TargetExam } from '../../types';
+import { AuthBackground3D } from './AuthBackground3D';
 
 export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSuccess }) => {
   const { loginUser, students, currentUser } = useApp();
@@ -126,8 +127,11 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
   return (
     <div className="min-h-screen bg-[#080b11] text-slate-100 flex flex-col justify-between p-4 sm:p-8 select-none relative overflow-hidden font-sans">
       
+      {/* 3D WebGL Interactive Science & STEM Background Animation */}
+      <AuthBackground3D />
+
       {/* Ambient Depth Elements (Zero cheap neon) */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-slate-800/15 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-blue-900/10 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.03] bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]" />
 
       {/* Top Header Bar */}
