@@ -178,5 +178,5 @@ export function initGoogleAnalytics(measurementId: string) {
 }
 
 export function getSavedGaMeasurementId(): string {
-  return localStorage.getItem(GA_KEY) || '';
+  return localStorage.getItem(GA_KEY) || import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-V7BWEXCZ7G';
 }

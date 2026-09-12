@@ -1,5 +1,22 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import type { User, ContentItem, CBTExam, StudentTestResult, ChatMessage, LectureItem, SocialChannel, TargetExam, DPPItem, LeaderboardEntry, SystemNotification } from '../types';
+import { 
+  syncStudentToFirestore, 
+  subscribeToStudents,
+  syncExamToFirestore, 
+  deleteExamFromFirestore, 
+  subscribeToExams,
+  syncLectureToFirestore, 
+  deleteLectureFromFirestore,
+  subscribeToLectures,
+  syncMaterialToFirestore, 
+  deleteMaterialFromFirestore,
+  subscribeToMaterials,
+  syncTestResultToFirestore, 
+  subscribeToTestResults,
+  syncChatMessageToFirestore, 
+  subscribeToChatMessages
+} from '../services/firebase';
 
 const INITIAL_SOCIAL_CHANNELS: SocialChannel[] = [
   {
@@ -620,6 +637,72 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('edparth_results', JSON.stringify(testResults));
   }, [testResults]);
 
+  // Real-time Firestore Cloud Synchronization
+  useEffect(() => {
+    const unsubStudents = subscribeToStudents((cloudStudents) => {
+      setStudents(prev => {
+        const map = new Map<string, User>();
+        prev.forEach(s => map.set(s.id, s));
+        cloudStudents.forEach(s => map.set(s.id, s));
+        return Array.from(map.values());
+      });
+    });
+
+    const unsubExams = subscribeToExams((cloudExams) => {
+      setExams(prev => {
+        const map = new Map<string, CBTExam>();
+        prev.forEach(e => map.set(e.id, e));
+        cloudExams.forEach(e => map.set(e.id, e));
+        return Array.from(map.values());
+      });
+    });
+
+    const unsubLectures = subscribeToLectures((cloudLectures) => {
+      setLectures(prev => {
+        const map = new Map<string, LectureItem>();
+        prev.forEach(l => map.set(l.id, l));
+        cloudLectures.forEach(l => map.set(l.id, l));
+        return Array.from(map.values());
+      });
+    });
+
+    const unsubMaterials = subscribeToMaterials((cloudMaterials) => {
+      setContentList(prev => {
+        const map = new Map<string, ContentItem>();
+        prev.forEach(m => map.set(m.id, m));
+        cloudMaterials.forEach(m => map.set(m.id, m));
+        return Array.from(map.values());
+      });
+    });
+
+    const unsubResults = subscribeToTestResults((cloudResults) => {
+      setTestResults(prev => {
+        const map = new Map<string, StudentTestResult>();
+        prev.forEach(r => map.set(r.id, r));
+        cloudResults.forEach(r => map.set(r.id, r));
+        return Array.from(map.values());
+      });
+    });
+
+    const unsubChats = subscribeToChatMessages((cloudChats) => {
+      setChatMessages(prev => {
+        const map = new Map<string, ChatMessage>();
+        prev.forEach(m => map.set(m.id, m));
+        cloudChats.forEach(m => map.set(m.id, m));
+        return Array.from(map.values());
+      });
+    });
+
+    return () => {
+      unsubStudents();
+      unsubExams();
+      unsubLectures();
+      unsubMaterials();
+      unsubResults();
+      unsubChats();
+    };
+  }, []);
+
   const handleSetHasSeenIntro = (val: boolean) => {
     setHasSeenIntro(val);
     sessionStorage.setItem('edparth_seen_intro', String(val));
@@ -672,6 +755,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setStudents(prev => [newStudent, ...prev]);
     setCurrentUser(newStudent);
+    syncStudentToFirestore(newStudent);
     closeAuthModal();
   };
 
@@ -683,18 +767,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       downloadsCount: 0
     };
     setContentList(prev => [newItem, ...prev]);
+    syncMaterialToFirestore(newItem);
   };
 
   const deleteContentItem = (id: string) => {
     setContentList(prev => prev.filter(c => c.id !== id));
+    deleteMaterialFromFirestore(id);
   };
 
   const addCBTExam = (exam: CBTExam) => {
     setExams(prev => [exam, ...prev]);
+    syncExamToFirestore(exam);
   };
 
   const deleteCBTExam = (id: string) => {
     setExams(prev => prev.filter(e => e.id !== id));
+    deleteExamFromFirestore(id);
   };
 
   const addLecture = (lec: Omit<LectureItem, 'id' | 'addedAt'>) => {
@@ -704,10 +792,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addedAt: new Date().toISOString().split('T')[0]
     };
     setLectures(prev => [newLec, ...prev]);
+    syncLectureToFirestore(newLec);
   };
 
   const deleteLecture = (id: string) => {
     setLectures(prev => prev.filter(l => l.id !== id));
+    deleteLectureFromFirestore(id);
   };
 
   const sendChatMessage = (message: string, isRequest: boolean = false) => {
@@ -722,6 +812,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       isRequest
     };
     setChatMessages(prev => [...prev, newMsg]);
+    syncChatMessageToFirestore(newMsg);
   };
 
   const submitTestResult = (result: Omit<StudentTestResult, 'id' | 'timestamp'>) => {
@@ -731,6 +822,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       timestamp: new Date().toISOString()
     };
     setTestResults(prev => [newResult, ...prev]);
+    syncTestResultToFirestore(newResult);
 
     if (currentUser && currentUser.role === 'student') {
       const updatedUser: User = {
@@ -744,6 +836,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       };
       setCurrentUser(updatedUser);
       setStudents(prev => prev.map(s => s.id === updatedUser.id ? updatedUser : s));
+      syncStudentToFirestore(updatedUser);
     }
   };
 

@@ -24,4 +24,5 @@ dist-ssr
 *.sw?
 .gemini
 .antigravity
+.env
 .env*.local
