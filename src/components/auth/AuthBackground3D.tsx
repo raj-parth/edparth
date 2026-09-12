@@ -82,29 +82,33 @@ export const AuthBackground3D: React.FC = () => {
     worldGroup.add(waveMesh);
 
     // ==========================================
-    // 3. FLOATING 3D TORUS KNOT (Top Right Depth - Behind Login Card)
+    // 3. FLOATING 3D TORUS KNOT (Fully Framed & Centered in View)
     // ==========================================
-    const torusKnotGeo = new THREE.TorusKnotGeometry(1.6, 0.38, 100, 18, 2, 3);
+    const torusKnotGeo = new THREE.TorusKnotGeometry(1.25, 0.3, 100, 18, 2, 3);
     const torusKnotMat = new THREE.MeshBasicMaterial({
-      color: 0x3b82f6,
+      color: 0x38bdf8, // Vibrant Electric Sky Blue
       wireframe: true,
       transparent: true,
-      opacity: 0.45
+      opacity: 0.65
     });
     const torusKnot = new THREE.Mesh(torusKnotGeo, torusKnotMat);
-    torusKnot.position.set(4.8, 1.6, -3.0);
+    torusKnot.position.set(3.6, 0.8, -1.8);
     worldGroup.add(torusKnot);
 
-    // Torus points for glowing vertices
+    // Torus points for glowing white/cyan vertices
     const torusPointsMat = new THREE.PointsMaterial({
-      color: 0x93c5fd,
-      size: 0.07,
+      color: 0xffffff,
+      size: 0.08,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.9,
       blending: THREE.AdditiveBlending
     });
     const torusPoints = new THREE.Points(torusKnotGeo, torusPointsMat);
     torusKnot.add(torusPoints);
+
+    // Glowing Point Light inside Torus Knot
+    const torusLight = new THREE.PointLight(0x38bdf8, 6, 10);
+    torusKnot.add(torusLight);
 
     // ==========================================
     // 4. FLOATING STEM POLYHEDRA (Left & Center Depth)
@@ -309,10 +313,11 @@ export const AuthBackground3D: React.FC = () => {
       }
       posAttr.needsUpdate = true;
 
-      // B. Animate Torus Knot
-      torusKnot.rotation.x = elapsedTime * 0.18;
-      torusKnot.rotation.y = elapsedTime * 0.25;
-      torusKnot.position.y = 1.8 + Math.sin(elapsedTime * 0.8) * 0.25;
+      // B. Animate Torus Knot - smoothly floating and orbiting in comfortable view
+      torusKnot.rotation.x = elapsedTime * 0.22;
+      torusKnot.rotation.y = elapsedTime * 0.28;
+      torusKnot.position.y = 0.8 + Math.sin(elapsedTime * 0.6) * 0.12;
+      torusKnot.position.x = 3.6 + Math.cos(elapsedTime * 0.4) * 0.15;
 
       // C. Animate Dodecahedron & Core
       dodecaMesh.rotation.x = elapsedTime * 0.22;

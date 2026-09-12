@@ -214,9 +214,9 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
 
           </div>
 
-          {/* Right Column: Premium Auth Terminal Card (6 Cols) - Frosted Glass */}
+          {/* Right Column: Premium Auth Terminal Card (6 Cols) - Crystal Glass */}
           <div className="lg:col-span-6">
-            <div className="bg-slate-900/35 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 border border-white/15 shadow-[0_12px_45px_rgba(0,0,0,0.6)] space-y-5 text-left relative ring-1 ring-white/10">
+            <div className="bg-slate-950/20 backdrop-blur-[6px] rounded-3xl p-6 sm:p-8 border border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.4)] space-y-5 text-left relative ring-1 ring-white/15">
               
               {/* If user is already saved, show quick continue banner */}
               {currentUser && (
