@@ -1,6 +1,9 @@
-# 🎓 EdParth Study — Next-Gen Education Platform & CBT Engine
+# 🎓 EdParth Study — Next-Gen Education Platform & NTA CBT Engine
 
 > Specially built for **Class 9 to 12 CBSE/ICSE**, **JEE Main & Advanced**, **NEET UG**, and **Competitive Government Examinations (SSC, NDA, CUET)**.
+> Powered by **React 19**, **Firebase Cloud Firestore**, **Firebase Authentication**, **Google Analytics 4**, and **Tailwind CSS v4**.
+
+📖 **[Read the Full Technical & Architectural Documentation (PROJECT_DOCUMENTATION.md)](./PROJECT_DOCUMENTATION.md)**
 
 ---
 
@@ -26,29 +29,42 @@
 - Smart parser detects questions, options `(A, B, C, D)`, diagrams, and answer keys.
 - Visual Question Editor to adjust questions, attach PNG diagrams/figures, edit markings (+4/-1), and publish live tests in one click.
 
-### 4. 🛡️ Master Admin Control Hub
-- **Default Test Admin Credentials**: `admin@edparth.com` / `admin123`
-- **Realtime Student Directory**: View registered student profiles (Name, Class 9-12/Dropper, Target Exam, School/Institute, Mobile, Tests given, Avg accuracy, Daily streak).
+### 4. 🔒 Enterprise Firebase Authentication & Cloud Firestore
+- **Real Production Auth**: Secure email/password login & registration powered by Firebase Auth with SHA-256 fallback protection. Minimum 6-character password security.
+- **Cloud Firestore Database**: Real-time cross-device synchronization for tests, submissions, study materials, student directory, and community chat.
+- **₹0 Unlimited Storage Architecture**: Leverages high-capacity Telegram Channel integration (`t.me/edparthbooks`) and Google Drive links to keep storage 100% free with zero credit card required.
+
+### 5. 🛡️ Master Admin Control Hub
+- **Access Route**: Accessible securely via `/admin`, `?admin=true`, or `?portal=admin` with real-time admin authorization.
+- **Realtime Student Directory**: Monitor live registered student profiles (Target Exam, Class, Streak, Tests given, Accuracy).
+- **Test Management & Live Publishing**: Create, schedule, activate, or archive CBT tests in real-time.
 - **Content & Notes Manager**: Upload reference books, chapter revision notes, DPP worksheets, and formula cheat sheets.
-- **Student Request Desk**: Review and fulfill custom study material requests submitted by students with direct download links and teacher notes.
+- **Student Request Desk**: Review and fulfill custom study material requests submitted by students.
 
-### 5. 🚀 Gen-Z Study Widgets
+### 6. 📱 App-Like Mobile Navigation & DRM Anti-Theft Guard
+- **Mobile Bottom Navigation Bar**: Floating glassmorphic dock for intuitive thumb navigation on all mobile viewports.
+- **DRM Anti-Piracy Protection**: Protects premium mock tests, question banks, and notes with right-click prevention, text-selection locks, developer shortcuts disabled, and watermark defense.
+
+### 7. 🚀 Gen-Z Study Widgets & Community
 - **Pomodoro Deep Study Clock**: Focus & Break modes with flip clock.
-- **Formula Flashcard**: 3D flip cards for high-yield exam tips and key formulas.
+- **Formula Flashcards**: 3D flip cards for high-yield exam tips and key formulas.
 - **Daily Streak & XP Tracker**: Motivates students with daily streak fire and level badges.
-
-### 6. 👨‍💻 Developer Credit
-- Developed with ❤️ by **RAJ** (Lead Architect & Developer).
+- **Live Community Chat**: Real-time doubt-solving and peer discussion channel.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 19 + TypeScript + Vite
-- **Styling**: Tailwind CSS v4 + Glassmorphism & Neon Glow effects
-- **Animation**: Framer Motion + Canvas Particles Physics + Canvas Confetti
-- **Icons**: Lucide React
-- **Deployment Ready**: Vercel (`vercel.json`), Supabase-ready client architecture, GitHub.
+| Layer | Technology |
+|---|---|
+| **Frontend** | React 19, TypeScript, Vite |
+| **Styling** | Tailwind CSS v4, Glassmorphism, CSS Canvas Physics |
+| **Database** | Google Cloud Firestore (Real-time NoSQL) |
+| **Authentication** | Firebase Auth (Email/Password + SHA-256) |
+| **Analytics** | Google Analytics 4 (Measurement ID: `G-V7BWEXCZ7G`) |
+| **Storage Architecture** | Telegram Channel (`t.me/edparthbooks`) + Google Drive + Firebase Storage |
+| **Icons & Effects** | Lucide React, Canvas Confetti, Framer Motion |
+| **Deployment** | Vercel / Netlify / Cloudflare Pages |
 
 ---
 
@@ -67,17 +83,16 @@ npm run build
 
 ---
 
-## 🌐 Deploy to Vercel in 1-Click
+## 👨‍💻 Project Team & Attribution
 
-1. Push your repository to **GitHub**:
-   ```bash
-   git init
-   git add .
-   git commit -m "feat: EdParth Study complete platform"
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/edparth-study.git
-   git push -u origin main
-   ```
-2. Open **[vercel.com](https://vercel.com)** -> Import your GitHub repository.
-3. Keep default settings (`Framework: Vite`, `Build Command: npm run build`, `Output Directory: dist`).
-4. Click **Deploy**! 🚀
+- **Lead Architect & Developer**: **RAJ KANNAUJIYA**
+- **Core Team**: **TEAM PARTH**
+- **Brand & Platform**: **EdParth Study** (edparth.com)
+
+---
+
+## 📚 Complete Project Documentation
+
+For complete database schema specifications, collection fields, security rules, environment configurations, and admin user guides, see:
+👉 **[PROJECT_DOCUMENTATION.md](./PROJECT_DOCUMENTATION.md)**
+
