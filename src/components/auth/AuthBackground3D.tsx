@@ -82,17 +82,17 @@ export const AuthBackground3D: React.FC = () => {
     worldGroup.add(waveMesh);
 
     // ==========================================
-    // 3. FLOATING 3D TORUS KNOT (Fully Framed & Centered in View)
+    // 3. FLOATING 3D TORUS KNOT ("Snake Wala" - Positioned on the LEFT in Open View)
     // ==========================================
-    const torusKnotGeo = new THREE.TorusKnotGeometry(1.25, 0.3, 100, 18, 2, 3);
+    const torusKnotGeo = new THREE.TorusKnotGeometry(1.35, 0.32, 100, 18, 2, 3);
     const torusKnotMat = new THREE.MeshBasicMaterial({
       color: 0x38bdf8, // Vibrant Electric Sky Blue
       wireframe: true,
       transparent: true,
-      opacity: 0.65
+      opacity: 0.75
     });
     const torusKnot = new THREE.Mesh(torusKnotGeo, torusKnotMat);
-    torusKnot.position.set(3.6, 0.8, -1.8);
+    torusKnot.position.set(-4.0, 1.1, -1.8);
     worldGroup.add(torusKnot);
 
     // Torus points for glowing white/cyan vertices
@@ -100,43 +100,57 @@ export const AuthBackground3D: React.FC = () => {
       color: 0xffffff,
       size: 0.08,
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.95,
       blending: THREE.AdditiveBlending
     });
     const torusPoints = new THREE.Points(torusKnotGeo, torusPointsMat);
     torusKnot.add(torusPoints);
 
     // Glowing Point Light inside Torus Knot
-    const torusLight = new THREE.PointLight(0x38bdf8, 6, 10);
+    const torusLight = new THREE.PointLight(0x38bdf8, 7, 12);
     torusKnot.add(torusLight);
 
     // ==========================================
-    // 4. FLOATING STEM POLYHEDRA (Left & Center Depth)
+    // 4. FLOATING 3D DODECAHEDRON ("Dba" Geometric Box - Positioned on the RIGHT)
     // ==========================================
-    // A. Dodecahedron (Deep Knowledge Symbol)
-    const dodecaGeo = new THREE.DodecahedronGeometry(1.2, 0);
+    const dodecaGeo = new THREE.DodecahedronGeometry(1.4, 0);
     const dodecaMat = new THREE.MeshStandardMaterial({
-      color: 0x1d4ed8,
+      color: 0x3b82f6,
       wireframe: true,
       transparent: true,
-      opacity: 0.28,
-      roughness: 0.3,
+      opacity: 0.55,
+      roughness: 0.2,
       metalness: 0.8
     });
     const dodecaMesh = new THREE.Mesh(dodecaGeo, dodecaMat);
-    dodecaMesh.position.set(-5.5, -0.4, -2.5);
+    dodecaMesh.position.set(3.8, 0.9, -1.8);
     worldGroup.add(dodecaMesh);
 
-    // Inner Glowing Core inside Dodecahedron
-    const dodecaCoreGeo = new THREE.OctahedronGeometry(0.5, 0);
-    const dodecaCoreMat = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
-      wireframe: false,
+    // Dodecahedron Glowing Points on Vertices
+    const dodecaPointsMat = new THREE.PointsMaterial({
+      color: 0x93c5fd,
+      size: 0.08,
       transparent: true,
-      opacity: 0.4
+      opacity: 0.9,
+      blending: THREE.AdditiveBlending
+    });
+    const dodecaPoints = new THREE.Points(dodecaGeo, dodecaPointsMat);
+    dodecaMesh.add(dodecaPoints);
+
+    // Inner Glowing Core inside Dodecahedron ("Dba Core")
+    const dodecaCoreGeo = new THREE.OctahedronGeometry(0.65, 0);
+    const dodecaCoreMat = new THREE.MeshBasicMaterial({
+      color: 0xf59e0b, // Warm Amber Gold Core
+      wireframe: true,
+      transparent: true,
+      opacity: 0.7
     });
     const dodecaCore = new THREE.Mesh(dodecaCoreGeo, dodecaCoreMat);
     dodecaMesh.add(dodecaCore);
+
+    // Light inside Dodecahedron
+    const dodecaLight = new THREE.PointLight(0x3b82f6, 5, 10);
+    dodecaMesh.add(dodecaLight);
 
     // B. Floating Octahedron (Physics Diamond)
     const octaGeo = new THREE.OctahedronGeometry(0.85, 0);
@@ -313,16 +327,17 @@ export const AuthBackground3D: React.FC = () => {
       }
       posAttr.needsUpdate = true;
 
-      // B. Animate Torus Knot - smoothly floating and orbiting in comfortable view
+      // B. Animate Torus Knot ("Snake Wala") - Floating majestically on the LEFT
       torusKnot.rotation.x = elapsedTime * 0.22;
       torusKnot.rotation.y = elapsedTime * 0.28;
-      torusKnot.position.y = 0.8 + Math.sin(elapsedTime * 0.6) * 0.12;
-      torusKnot.position.x = 3.6 + Math.cos(elapsedTime * 0.4) * 0.15;
+      torusKnot.position.y = 1.1 + Math.sin(elapsedTime * 0.6) * 0.15;
+      torusKnot.position.x = -4.0 + Math.cos(elapsedTime * 0.4) * 0.15;
 
-      // C. Animate Dodecahedron & Core
+      // C. Animate Dodecahedron & Core ("Dba") - Floating on the RIGHT behind card
       dodecaMesh.rotation.x = elapsedTime * 0.22;
       dodecaMesh.rotation.y = elapsedTime * 0.3;
-      dodecaMesh.position.y = -0.4 + Math.sin(elapsedTime * 0.7 + 1) * 0.2;
+      dodecaMesh.position.y = 0.9 + Math.sin(elapsedTime * 0.7 + 1) * 0.15;
+      dodecaMesh.position.x = 3.8 + Math.cos(elapsedTime * 0.5) * 0.15;
       dodecaCore.rotation.x = -elapsedTime * 0.5;
       dodecaCore.rotation.z = elapsedTime * 0.4;
 
