@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Upload, Search, Filter, Trash2, Sparkles, Shield, MoreVertical, Zap, MessageSquare, Tv, Share2, Plus, ExternalLink, Play, BarChart3 } from 'lucide-react';
+import { 
+  Users, Upload, Search, Filter, Trash2, Sparkles, Shield, MoreVertical, Zap, 
+  MessageSquare, Tv, Share2, Plus, ExternalLink, Play, BarChart3,
+  FileUp, CheckCircle2, AlertCircle, Loader2, FileText, Image as ImageIcon, Link2, FolderUp
+} from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { PdfToCbtConverter } from '../cbt/PdfToCbtConverter';
 import { AnalyticsTab } from './AnalyticsTab';
+import { uploadFileToFirebaseStorage, formatFileSize } from '../../services/firebase';
 import type { ContentItem, LectureItem, SocialChannel, ExamCategory } from '../../types';
 
 export const AdminDashboard: React.FC = () => {
@@ -42,6 +47,16 @@ export const AdminDashboard: React.FC = () => {
   const [newThumbnail, setNewThumbnail] = useState('');
   const [newTags, setNewTags] = useState('Mechanics, High Yield, PYQs');
 
+  // Cloud Storage Upload States
+  const [uploadMethod, setUploadMethod] = useState<'file' | 'link'>('file');
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadedFileName, setUploadedFileName] = useState('');
+
+  const [isUploadingThumb, setIsUploadingThumb] = useState(false);
+  const [thumbUploadProgress, setThumbUploadProgress] = useState(0);
+  const [uploadedThumbName, setUploadedThumbName] = useState('');
+
   // New Lecture Form State
   const [lecTitle, setLecTitle] = useState('');
   const [lecChannel, setLecChannel] = useState('edparth Official');
@@ -78,6 +93,56 @@ export const AdminDashboard: React.FC = () => {
   });
 
   const studentRequests = chatMessages.filter(m => m.isRequest);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingFile(true);
+    setUploadProgress(0);
+    setUploadedFileName(file.name);
+
+    if (!newTitle.trim()) {
+      const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+      setNewTitle(nameWithoutExt);
+    }
+
+    try {
+      const res = await uploadFileToFirebaseStorage(file, 'materials', (percent) => {
+        setUploadProgress(percent);
+      });
+      setNewFileUrl(res.downloadUrl);
+      setNewFileSize(res.fileSizeFormatted);
+      showNotification(`File "${file.name}" (${res.fileSizeFormatted}) uploaded to Cloud Storage!`);
+    } catch (err: any) {
+      console.error(err);
+      showNotification(`Upload error: ${err.message || 'Please check Storage rules in Firebase'}`);
+    } finally {
+      setIsUploadingFile(false);
+    }
+  };
+
+  const handleThumbUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingThumb(true);
+    setThumbUploadProgress(0);
+    setUploadedThumbName(file.name);
+
+    try {
+      const res = await uploadFileToFirebaseStorage(file, 'thumbnails', (percent) => {
+        setThumbUploadProgress(percent);
+      });
+      setNewThumbnail(res.downloadUrl);
+      showNotification(`Thumbnail "${file.name}" uploaded to Cloud Storage!`);
+    } catch (err: any) {
+      console.error(err);
+      showNotification(`Thumbnail upload error: ${err.message}`);
+    } finally {
+      setIsUploadingThumb(false);
+    }
+  };
 
   const handleUploadContent = (e: React.FormEvent) => {
     e.preventDefault();
@@ -406,21 +471,140 @@ export const AdminDashboard: React.FC = () => {
                     type="text"
                     value={newFileSize}
                     onChange={(e) => setNewFileSize(e.target.value)}
-                    placeholder="12.5 MB"
+                    placeholder="e.g. 12.5 MB"
                     className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-indigo-600"
                   />
                 </div>
               </div>
 
+              {/* Cloud Storage File Upload Section */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">PDF File Download Link</label>
-                <input
-                  type="text"
-                  value={newFileUrl}
-                  onChange={(e) => setNewFileUrl(e.target.value)}
-                  placeholder="https://.../document.pdf"
-                  className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-indigo-600"
-                />
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-slate-700">PDF Document / Book *</label>
+                  <span className="text-[10px] font-mono text-indigo-700 bg-indigo-50 border border-indigo-200/60 px-2 py-0.5 rounded-full font-bold">
+                    Firebase 5GB Cloud Bucket
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-xl mb-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setUploadMethod('file')}
+                    className={`py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      uploadMethod === 'file'
+                        ? 'bg-white text-indigo-700 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <FileUp className="w-3.5 h-3.5" />
+                    <span>Upload from Device</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUploadMethod('link')}
+                    className={`py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      uploadMethod === 'link'
+                        ? 'bg-white text-indigo-700 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Link2 className="w-3.5 h-3.5" />
+                    <span>External URL / Drive</span>
+                  </button>
+                </div>
+
+                {uploadMethod === 'file' ? (
+                  <div className="border-2 border-dashed border-slate-200 hover:border-indigo-400 bg-slate-50/60 rounded-2xl p-4 text-center transition-all relative">
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,.epub,.ppt,.pptx,.zip"
+                      onChange={handleFileUpload}
+                      disabled={isUploadingFile}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
+                    />
+                    {isUploadingFile ? (
+                      <div className="space-y-2 py-2">
+                        <Loader2 className="w-6 h-6 text-indigo-600 animate-spin mx-auto" />
+                        <p className="text-xs font-bold text-slate-800">Uploading to Firebase Storage Bucket...</p>
+                        <div className="w-full bg-slate-200 rounded-full h-2 max-w-xs mx-auto overflow-hidden">
+                          <div 
+                            className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                        <p className="text-[11px] font-mono text-indigo-600 font-bold">{uploadProgress}% Complete</p>
+                      </div>
+                    ) : newFileUrl ? (
+                      <div className="space-y-1.5 py-1 text-left bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+                        <div className="flex items-center gap-2 text-emerald-700">
+                          <CheckCircle2 className="w-4 h-4 shrink-0" />
+                          <p className="text-xs font-bold truncate">File Uploaded: {uploadedFileName || 'Ready in Bucket'}</p>
+                        </div>
+                        <p className="text-[10px] text-emerald-600 font-mono truncate">{newFileUrl}</p>
+                        <p className="text-[10px] font-bold text-slate-500">Size: {newFileSize} • Click to replace file</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-1 py-2">
+                        <FileUp className="w-6 h-6 text-indigo-600 mx-auto" />
+                        <p className="text-xs font-bold text-slate-800">Click to pick or Drag & Drop PDF / Notes</p>
+                        <p className="text-[10px] text-slate-400">PDF, DOCX, EPUB directly stored in Firebase bucket</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="text"
+                      value={newFileUrl}
+                      onChange={(e) => setNewFileUrl(e.target.value)}
+                      placeholder="https://t.me/edparthbooks or Google Drive Link"
+                      className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-indigo-600"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Cover Thumbnail Image Picker */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
+                  <span>Cover Thumbnail</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Optional Cover Image</span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleThumbUpload}
+                      disabled={isUploadingThumb}
+                      id="thumb-upload-input"
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="thumb-upload-input"
+                      className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer transition-colors border border-slate-200"
+                    >
+                      {isUploadingThumb ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />
+                          <span>Uploading... {thumbUploadProgress}%</span>
+                        </>
+                      ) : (
+                        <>
+                          <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>{uploadedThumbName ? 'Change Image' : 'Upload Cover Image'}</span>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                  {newThumbnail && (
+                    <img 
+                      src={newThumbnail} 
+                      alt="Thumbnail preview" 
+                      className="w-9 h-9 rounded-xl object-cover border border-slate-200 shrink-0 shadow-2xs" 
+                    />
+                  )}
+                </div>
               </div>
 
               <div>
@@ -436,9 +620,11 @@ export const AdminDashboard: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                disabled={isUploadingFile || isUploadingThumb}
+                className="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
               >
-                + Publish Study Material
+                <Upload className="w-4 h-4" />
+                <span>+ Publish Study Material</span>
               </button>
             </form>
           </div>

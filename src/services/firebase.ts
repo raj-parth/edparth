@@ -22,6 +22,13 @@ import {
   onAuthStateChanged,
   type User as FirebaseUser 
 } from 'firebase/auth';
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject
+} from 'firebase/storage';
 import type { User, ContentItem, CBTExam, StudentTestResult, ChatMessage, LectureItem, ClassGrade, TargetExam } from '../types';
 
 export const firebaseConfig = {
@@ -38,6 +45,7 @@ export const firebaseConfig = {
 export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const storage = getStorage(app);
 
 // -------------------------------------------------------------
 // FIRESTORE COLLECTIONS & SYNCHRONIZATION HELPERS
@@ -441,4 +449,65 @@ export async function logoutStudentFromFirebase(): Promise<void> {
     console.warn('[Firebase Auth] Signout notice:', err);
   }
 }
+
+// -------------------------------------------------------------
+// 8. FIREBASE CLOUD STORAGE HELPERS (BUCKET UPLOADS)
+// -------------------------------------------------------------
+
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+export interface StorageUploadResult {
+  downloadUrl: string;
+  fileSizeFormatted: string;
+  fileName: string;
+  fullPath: string;
+}
+
+export async function uploadFileToFirebaseStorage(
+  file: File,
+  folder: 'materials' | 'thumbnails' | 'exams' | 'general' = 'materials',
+  onProgress?: (percent: number) => void
+): Promise<StorageUploadResult> {
+  const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const fullPath = `${folder}/${Date.now()}_${cleanName}`;
+  const storageRef = ref(storage, fullPath);
+
+  return new Promise((resolve, reject) => {
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        if (snapshot.totalBytes > 0) {
+          const percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          onProgress?.(percent);
+        }
+      },
+      (error) => {
+        console.error('[Firebase Storage] Upload error:', error);
+        reject(error);
+      },
+      async () => {
+        try {
+          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          resolve({
+            downloadUrl,
+            fileSizeFormatted: formatFileSize(file.size),
+            fileName: file.name,
+            fullPath
+          });
+        } catch (err) {
+          reject(err);
+        }
+      }
+    );
+  });
+}
+
 
