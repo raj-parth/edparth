@@ -494,6 +494,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
 
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    if (!localStorage.getItem('edparth_fresh_production_v1')) {
+      localStorage.removeItem('edparth_current_user');
+      sessionStorage.removeItem('edparth_authenticated_session');
+      return null;
+    }
     const saved = localStorage.getItem('edparth_current_user');
     if (saved) {
       try {
@@ -512,6 +517,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const [students, setStudents] = useState<User[]>(() => {
+    if (!localStorage.getItem('edparth_fresh_production_v1')) {
+      localStorage.removeItem('edparth_students');
+      return [];
+    }
     const saved = localStorage.getItem('edparth_students');
     if (saved) {
       try {
@@ -637,6 +646,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem('edparth_results', JSON.stringify(testResults));
   }, [testResults]);
+
+  // One-time fresh production reset: wipes legacy test accounts across all browsers
+  useEffect(() => {
+    if (!localStorage.getItem('edparth_fresh_production_v1')) {
+      localStorage.removeItem('edparth_current_user');
+      localStorage.removeItem('edparth_students');
+      localStorage.removeItem('edparth_results');
+      sessionStorage.removeItem('edparth_authenticated_session');
+      localStorage.setItem('edparth_fresh_production_v1', 'true');
+      setCurrentUser(null);
+      setStudents([]);
+      setTestResults([]);
+    }
+  }, []);
 
   // Real-time Firestore Cloud Synchronization
   useEffect(() => {
