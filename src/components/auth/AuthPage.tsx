@@ -136,11 +136,11 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
 
       {/* Top Header Bar */}
       <header className="relative z-10 w-full max-w-6xl mx-auto flex items-center justify-between pb-6">
-        <div className="bg-slate-900/80 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-800 shadow-sm flex items-center gap-3">
+        <div className="bg-slate-900/40 backdrop-blur-xl px-4 py-2.5 rounded-2xl border border-white/10 shadow-lg flex items-center gap-3">
           <Logo size="md" theme="dark" showSubtitle={true} />
         </div>
 
-        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-800 text-xs font-mono backdrop-blur-sm text-slate-400">
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/40 border border-white/10 text-xs font-mono backdrop-blur-xl text-slate-300 shadow-lg">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-[11px] font-bold text-slate-300">256-BIT SECURE GATEWAY</span>
         </div>
@@ -169,10 +169,10 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
               </p>
             </div>
 
-            {/* 4 Feature Cards */}
+            {/* 4 Core Pillars Cards - Glassy Translucent */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-              <div className="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800/90 flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 shrink-0">
+              <div className="p-3.5 rounded-2xl bg-slate-900/35 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all flex items-start gap-3 shadow-lg shadow-black/20">
+                <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 shrink-0">
                   <Zap className="w-4 h-4" />
                 </div>
                 <div>
@@ -181,8 +181,8 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800/90 flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-[#ff6a00]/10 text-[#ff6a00] shrink-0">
+              <div className="p-3.5 rounded-2xl bg-slate-900/35 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all flex items-start gap-3 shadow-lg shadow-black/20">
+                <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 shrink-0">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
@@ -191,7 +191,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800/90 flex items-start gap-3">
+              <div className="p-3.5 rounded-2xl bg-slate-900/35 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all flex items-start gap-3 shadow-lg shadow-black/20">
                 <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
                   <BookOpen className="w-4 h-4" />
                 </div>
@@ -201,7 +201,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800/90 flex items-start gap-3">
+              <div className="p-3.5 rounded-2xl bg-slate-900/35 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all flex items-start gap-3 shadow-lg shadow-black/20">
                 <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 shrink-0">
                   <Shield className="w-4 h-4" />
                 </div>
@@ -214,18 +214,18 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
 
           </div>
 
-          {/* Right Column: Premium Auth Terminal Card (6 Cols) */}
+          {/* Right Column: Premium Auth Terminal Card (6 Cols) - Frosted Glass */}
           <div className="lg:col-span-6">
-            <div className="bg-slate-900/90 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl space-y-5 text-left relative">
+            <div className="bg-slate-900/35 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 border border-white/15 shadow-[0_12px_45px_rgba(0,0,0,0.6)] space-y-5 text-left relative ring-1 ring-white/10">
               
               {/* If user is already saved, show quick continue banner */}
               {currentUser && (
-                <div className="p-3.5 rounded-2xl bg-blue-950/40 border border-blue-600/30 flex items-center justify-between gap-3">
+                <div className="p-3.5 rounded-2xl bg-blue-950/40 backdrop-blur-md border border-blue-500/30 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <img
                       src={currentUser.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${currentUser.name}`}
                       alt={currentUser.name}
-                      className="w-9 h-9 rounded-xl border border-blue-500/40 bg-slate-800 shrink-0"
+                      className="w-9 h-9 rounded-xl border border-blue-500/40 bg-slate-800/80 shrink-0"
                     />
                     <div className="truncate text-left">
                       <p className="text-xs font-bold text-white truncate">Continue as {currentUser.name}</p>
@@ -245,15 +245,15 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                 </div>
               )}
 
-              {/* Top Mode Switcher */}
-              <div className="p-1 bg-slate-950 rounded-2xl border border-slate-800 flex items-center mb-5">
+              {/* Top Mode Switcher - Glass Dock */}
+              <div className="p-1 bg-slate-950/40 backdrop-blur-md rounded-2xl border border-white/10 flex items-center mb-5">
                 <button
                   type="button"
                   onClick={() => { setMode('login'); setErrorMessage(''); }}
                   className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     mode === 'login'
-                      ? 'bg-slate-800 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-white/15 text-white shadow-sm border border-white/20 backdrop-blur-md'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   Student Login
@@ -264,8 +264,8 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                   onClick={() => { setMode('signup'); setErrorMessage(''); }}
                   className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     mode === 'signup'
-                      ? 'bg-slate-800 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-white/15 text-white shadow-sm border border-white/20 backdrop-blur-md'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   Register (New Student)
@@ -277,8 +277,8 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                     onClick={() => { setMode('admin'); setErrorMessage(''); }}
                     className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       mode === 'admin'
-                        ? 'bg-slate-800 text-[#ff6a00] shadow-sm'
-                        : 'text-slate-400 hover:text-slate-200'
+                        ? 'bg-white/15 text-[#ff6a00] shadow-sm border border-white/20 backdrop-blur-md'
+                        : 'text-slate-400 hover:text-white hover:bg-white/5'
                     }`}
                   >
                     Admin Portal
@@ -329,7 +329,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder={mode === 'admin' ? 'admin@edparth.com' : 'student@gmail.com'}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-xs sm:text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-[#ff6a00] transition-colors"
+                        className="w-full bg-slate-950/45 backdrop-blur-md border border-white/15 rounded-xl pl-10 pr-4 py-3 text-xs sm:text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#ff6a00] focus:ring-2 focus:ring-[#ff6a00]/25 transition-all"
                       />
                     </div>
                   </div>
@@ -357,7 +357,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-11 py-3 text-xs sm:text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-[#ff6a00] transition-colors font-mono"
+                        className="w-full bg-slate-950/45 backdrop-blur-md border border-white/15 rounded-xl pl-10 pr-11 py-3 text-xs sm:text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#ff6a00] focus:ring-2 focus:ring-[#ff6a00]/25 transition-all font-mono"
                       />
                       <button
                         type="button"
@@ -416,7 +416,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Enter your full name"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#ff6a00]"
+                        className="w-full bg-slate-950/45 backdrop-blur-md border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#ff6a00] focus:ring-2 focus:ring-[#ff6a00]/25 transition-all"
                       />
                     </div>
 
@@ -428,7 +428,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="student@gmail.com"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#ff6a00]"
+                        className="w-full bg-slate-950/45 backdrop-blur-md border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#ff6a00] focus:ring-2 focus:ring-[#ff6a00]/25 transition-all"
                       />
                     </div>
                   </div>
@@ -439,13 +439,13 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                       <select
                         value={classGrade}
                         onChange={(e) => setClassGrade(e.target.value as ClassGrade)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#ff6a00]"
+                        className="w-full bg-slate-950/45 backdrop-blur-md border border-white/15 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#ff6a00] focus:ring-2 focus:ring-[#ff6a00]/25 transition-all"
                       >
-                        <option value="Class 12">Class 12th</option>
-                        <option value="Class 11">Class 11th</option>
-                        <option value="Class 10">Class 10th</option>
-                        <option value="Class 9">Class 9th</option>
-                        <option value="Dropper/Target">Dropper / Target 2026</option>
+                        <option value="Class 12" className="bg-slate-900 text-white">Class 12th</option>
+                        <option value="Class 11" className="bg-slate-900 text-white">Class 11th</option>
+                        <option value="Class 10" className="bg-slate-900 text-white">Class 10th</option>
+                        <option value="Class 9" className="bg-slate-900 text-white">Class 9th</option>
+                        <option value="Dropper/Target" className="bg-slate-900 text-white">Dropper / Target 2026</option>
                       </select>
                     </div>
 
@@ -454,15 +454,15 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                       <select
                         value={targetExam}
                         onChange={(e) => setTargetExam(e.target.value as TargetExam)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#ff6a00]"
+                        className="w-full bg-slate-950/45 backdrop-blur-md border border-white/15 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#ff6a00] focus:ring-2 focus:ring-[#ff6a00]/25 transition-all"
                       >
-                        <option value="JEE Main/Adv">JEE Main & Advanced</option>
-                        <option value="NEET UG">NEET UG Medical</option>
-                        <option value="CBSE Class 12">CBSE Class 12th Board</option>
-                        <option value="CBSE Class 11">CBSE Class 11th Foundation</option>
-                        <option value="CBSE Class 10">CBSE Class 10th Board</option>
-                        <option value="CBSE Class 9">CBSE Class 9th Foundation</option>
-                        <option value="Govt Exam (SSC/NDA/CUET)">Govt Exam (NDA / CUET)</option>
+                        <option value="JEE Main/Adv" className="bg-slate-900 text-white">JEE Main & Advanced</option>
+                        <option value="NEET UG" className="bg-slate-900 text-white">NEET UG Medical</option>
+                        <option value="CBSE Class 12" className="bg-slate-900 text-white">CBSE Class 12th Board</option>
+                        <option value="CBSE Class 11" className="bg-slate-900 text-white">CBSE Class 11th Foundation</option>
+                        <option value="CBSE Class 10" className="bg-slate-900 text-white">CBSE Class 10th Board</option>
+                        <option value="CBSE Class 9" className="bg-slate-900 text-white">CBSE Class 9th Foundation</option>
+                        <option value="Govt Exam (SSC/NDA/CUET)" className="bg-slate-900 text-white">Govt Exam (NDA / CUET)</option>
                       </select>
                     </div>
                   </div>
@@ -475,7 +475,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                         value={school}
                         onChange={(e) => setSchool(e.target.value)}
                         placeholder="e.g. DPS / KV / Allen"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#ff6a00]"
+                        className="w-full bg-slate-950/45 backdrop-blur-md border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#ff6a00] focus:ring-2 focus:ring-[#ff6a00]/25 transition-all"
                       />
                     </div>
 
@@ -486,7 +486,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="+91 98765 43210"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#ff6a00]"
+                        className="w-full bg-slate-950/45 backdrop-blur-md border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#ff6a00] focus:ring-2 focus:ring-[#ff6a00]/25 transition-all"
                       />
                     </div>
                   </div>
@@ -499,7 +499,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#ff6a00]"
+                      className="w-full bg-slate-950/45 backdrop-blur-md border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#ff6a00] focus:ring-2 focus:ring-[#ff6a00]/25 transition-all"
                     />
                   </div>
 

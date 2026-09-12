@@ -71,10 +71,10 @@ export const AuthBackground3D: React.FC = () => {
     waveGeometry.setAttribute('color', new THREE.BufferAttribute(waveColors, 3));
 
     const waveMaterial = new THREE.PointsMaterial({
-      size: 0.065,
+      size: 0.08,
       vertexColors: true,
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.88,
       blending: THREE.AdditiveBlending
     });
 
@@ -82,25 +82,25 @@ export const AuthBackground3D: React.FC = () => {
     worldGroup.add(waveMesh);
 
     // ==========================================
-    // 3. FLOATING 3D TORUS KNOT (Top Right Depth)
+    // 3. FLOATING 3D TORUS KNOT (Top Right Depth - Behind Login Card)
     // ==========================================
-    const torusKnotGeo = new THREE.TorusKnotGeometry(1.5, 0.35, 90, 16, 2, 3);
+    const torusKnotGeo = new THREE.TorusKnotGeometry(1.6, 0.38, 100, 18, 2, 3);
     const torusKnotMat = new THREE.MeshBasicMaterial({
       color: 0x3b82f6,
       wireframe: true,
       transparent: true,
-      opacity: 0.22
+      opacity: 0.45
     });
     const torusKnot = new THREE.Mesh(torusKnotGeo, torusKnotMat);
-    torusKnot.position.set(5.2, 1.8, -3.5);
+    torusKnot.position.set(4.8, 1.6, -3.0);
     worldGroup.add(torusKnot);
 
     // Torus points for glowing vertices
     const torusPointsMat = new THREE.PointsMaterial({
-      color: 0x60a5fa,
-      size: 0.05,
+      color: 0x93c5fd,
+      size: 0.07,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.85,
       blending: THREE.AdditiveBlending
     });
     const torusPoints = new THREE.Points(torusKnotGeo, torusPointsMat);
@@ -378,8 +378,8 @@ export const AuthBackground3D: React.FC = () => {
   return (
     <div 
       ref={mountRef} 
-      className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-85"
-      style={{ filter: 'contrast(1.05)' }}
+      className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-100"
+      style={{ filter: 'contrast(1.08)' }}
     />
   );
 };
