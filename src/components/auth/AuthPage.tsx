@@ -8,6 +8,13 @@ import type { ClassGrade, TargetExam } from '../../types';
 export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSuccess }) => {
   const { loginUser, registerStudent, students, currentUser } = useApp();
 
+  const isSecretAdminUrl = typeof window !== 'undefined' && (
+    new URLSearchParams(window.location.search).get('admin') === 'true' ||
+    new URLSearchParams(window.location.search).get('portal') === 'admin' ||
+    window.location.pathname === '/admin'
+  );
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState(isSecretAdminUrl);
+
   const [mode, setMode] = useState<'login' | 'signup' | 'admin'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -35,7 +42,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
         loginUser({
           id: 'admin_1',
           name: 'RAJ (Master Admin)',
-          email: 'parthverse0@gmail.com',
+          email: trimmedEmail,
           role: 'admin',
           avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
           joinedAt: '2026-01-01',
@@ -178,22 +185,6 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
               </div>
             </div>
 
-            {/* Admin Console Shortcut */}
-            <div className="pt-2 flex items-center gap-2">
-              <button
-                onClick={() => {
-                  setMode('admin');
-                  setEmail('parthverse0@gmail.com');
-                  setPassword('');
-                  setErrorMessage('');
-                }}
-                className="px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-[11px] font-bold text-[#ff6a00] hover:text-amber-400 transition-colors cursor-pointer flex items-center gap-1.5"
-              >
-                <Shield className="w-3.5 h-3.5" />
-                <span>Founder / Admin Access</span>
-              </button>
-            </div>
-
           </div>
 
           {/* Right Column: Premium Auth Terminal Card (6 Cols) */}
@@ -253,17 +244,19 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                   Create Account
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => { setMode('admin'); setErrorMessage(''); }}
-                  className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    mode === 'admin'
-                      ? 'bg-slate-800 text-[#ff6a00] shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  Admin Portal
-                </button>
+                {isAdminUnlocked && (
+                  <button
+                    type="button"
+                    onClick={() => { setMode('admin'); setErrorMessage(''); }}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      mode === 'admin'
+                        ? 'bg-slate-800 text-[#ff6a00] shadow-sm'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Admin Portal
+                  </button>
+                )}
               </div>
 
               {/* Error Notice */}
@@ -278,7 +271,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1.5 font-mono">
-                      {mode === 'admin' ? 'ADMINISTRATIVE EMAIL' : 'STUDENT GMAIL / EMAIL'}
+                      {mode === 'admin' ? 'ADMINISTRATIVE CREDENTIAL EMAIL' : 'STUDENT GMAIL / EMAIL'}
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
@@ -287,7 +280,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder={mode === 'admin' ? 'parthverse0@gmail.com' : 'student@gmail.com'}
+                        placeholder={mode === 'admin' ? 'admin@edparth.com' : 'student@gmail.com'}
                         className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-xs sm:text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-[#ff6a00] transition-colors"
                       />
                     </div>
@@ -468,7 +461,13 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
       <footer className="relative z-10 text-center text-xs text-slate-500 font-mono py-4">
         <span>DEVELOPED BY </span>
         <strong className="text-slate-400">RAJ KANNAUJIYA</strong>
-        <span className="mx-2 text-slate-700">//</span>
+        <span 
+          onClick={() => setIsAdminUnlocked(prev => !prev)}
+          className="mx-2 text-slate-700 hover:text-slate-500 cursor-pointer select-none transition-colors"
+          title="System Access"
+        >
+          //
+        </span>
         <span>TEAM: </span>
         <strong className="text-slate-400">TEAM PARTH</strong>
       </footer>

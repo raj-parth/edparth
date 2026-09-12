@@ -17,7 +17,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { currentUser, exams, openAuthModal, logoutUser, openSecurityModal } = useApp();
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200/80 p-5 flex flex-col justify-between shrink-0 min-h-screen font-sans">
+    <aside className="hidden lg:flex w-64 bg-white border-r border-slate-200/80 p-5 flex-col justify-between shrink-0 min-h-screen font-sans sticky top-0 h-screen overflow-y-auto">
       <div>
         {/* Brand Logo strictly 'EdParth' */}
         <div

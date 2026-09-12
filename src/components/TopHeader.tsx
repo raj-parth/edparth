@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Bell, MessageSquare, Flame, Shield, Target, Sparkles, ChevronDown, Coins, BarChart3 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { Logo } from './Logo';
 import { TargetGoalModal } from './widgets/TargetGoalModal';
 import { NotificationDrawer } from './widgets/NotificationDrawer';
 import { SecurityCenterModal } from './security/SecurityCenterModal';
@@ -38,17 +39,25 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
 
   return (
     <>
-      <header className="h-20 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 font-sans shadow-xs">
+      <header className="h-16 sm:h-20 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-3 sm:px-8 flex items-center justify-between sticky top-0 z-30 font-sans shadow-xs gap-2 sm:gap-4">
         
+        {/* Mobile Brand Logo */}
+        <div 
+          onClick={() => onNavigate && onNavigate('home')} 
+          className="lg:hidden shrink-0 cursor-pointer"
+        >
+          <Logo size="sm" showSubtitle={false} />
+        </div>
+
         {/* Left Section: Target Goal Switcher & Search Bar */}
-        <div className="flex items-center gap-3 w-full max-w-xl">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 max-w-xl min-w-0">
           
           {/* Target Goal Pill (Physics Wallah style goal switcher) */}
           <button
             onClick={openGoalModal}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/80 text-indigo-900 transition-all cursor-pointer shrink-0 shadow-xs"
+            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/80 text-indigo-900 transition-all cursor-pointer shrink-0 shadow-xs"
           >
-            <div className="w-5 h-5 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
+            <div className="w-5 h-5 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0">
               <Target className="w-3.5 h-3.5" />
             </div>
             <div className="text-left hidden md:block">
@@ -60,10 +69,19 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             </div>
           </button>
 
-          {/* Quick Search Bar (Ctrl+K) */}
+          {/* Search trigger on mobile (icon button) */}
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="sm:hidden w-9 h-9 rounded-2xl bg-[#f8fafc] border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 shrink-0 cursor-pointer"
+            title="Search"
+          >
+            <Search className="w-4 h-4" />
+          </button>
+
+          {/* Quick Search Bar (Ctrl+K) for tablet & desktop */}
           <div 
             onClick={() => setIsSearchOpen(true)}
-            className="relative w-full cursor-pointer group"
+            className="hidden sm:block relative w-full cursor-pointer group"
           >
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
             <div className="w-full bg-[#f8fafc] group-hover:bg-slate-100 border border-slate-200 rounded-2xl pl-11 pr-14 py-2.5 text-xs text-slate-500 flex items-center justify-between transition-all shadow-inner">
@@ -76,7 +94,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         </div>
 
         {/* Right Section: Gamification & Profile */}
-        <div className="flex items-center gap-2.5 sm:gap-3.5 ml-auto">
+        <div className="flex items-center gap-1.5 sm:gap-3.5 ml-auto shrink-0">
           
           {/* Daily Streak Flame Counter */}
           <div className="relative">
@@ -113,11 +131,11 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             <span className="text-xs font-black text-emerald-950 font-mono">{xpPoints} XP</span>
           </div>
 
-          {/* Security Center Shortcut */}
+          {/* Security Center Shortcut (desktop/tablet) */}
           <button
             onClick={openSecurityModal}
             title="EdParth DRM & Security Status"
-            className="w-10 h-10 rounded-2xl bg-[#f8fafc] hover:bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+            className="hidden sm:flex w-10 h-10 rounded-2xl bg-[#f8fafc] hover:bg-slate-100 border border-slate-200 text-slate-700 items-center justify-center transition-colors cursor-pointer"
           >
             <Shield className="w-4 h-4 text-[#ff6a00]" />
           </button>
@@ -127,12 +145,12 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             <button
               onClick={() => setIsNotificationOpen(true)}
               title="Notifications"
-              className="w-10 h-10 rounded-2xl bg-[#f8fafc] hover:bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#f8fafc] hover:bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
             >
               <Bell className="w-4 h-4" />
             </button>
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#ff6a00] text-white text-[10px] font-black flex items-center justify-center shadow-sm">
+              <span className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#ff6a00] text-white text-[9px] sm:text-[10px] font-black flex items-center justify-center shadow-sm">
                 {unreadCount}
               </span>
             )}

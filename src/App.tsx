@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { IntroScreen } from './components/IntroScreen';
-import { Sidebar } from './components/Sidebar';
+import { Sidebar, type NavViewType } from './components/Sidebar';
+import { MobileNavigation } from './components/navigation/MobileNavigation';
 import { TopHeader } from './components/TopHeader';
 import { StudentHomeView } from './components/student/StudentHomeView';
 import { CBTList } from './components/cbt/CBTList';
@@ -108,7 +109,7 @@ const MainApp: React.FC = () => {
         />
 
         {/* View Router */}
-        <main className="flex-1">
+        <main className="flex-1 pb-20 lg:pb-0">
           {activeView === 'home' && (
             <StudentHomeView
               onStartExam={(exam) => requireAuth(() => setActiveExam(exam))}
@@ -166,6 +167,12 @@ const MainApp: React.FC = () => {
         {/* Bottom Footer */}
         <Footer />
       </div>
+
+      {/* Dedicated Mobile Bottom Navigation (Phone / Tablet) */}
+      <MobileNavigation
+        activeView={activeView}
+        setActiveView={(view) => requireAuth(() => setActiveView(view))}
+      />
 
       {/* Authentication Modal */}
       <AuthModal />
