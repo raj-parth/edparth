@@ -179,7 +179,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
               onClick={() => openAuthModal('login')}
               className="px-5 py-2 rounded-2xl bg-slate-900 text-white font-bold text-xs shadow-sm hover:bg-slate-800 transition-all cursor-pointer ml-1"
             >
-              Sign In
+              Login
             </button>
           )}
         </div>

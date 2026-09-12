@@ -13,8 +13,16 @@ import {
   limit,
   serverTimestamp
 } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import type { User, ContentItem, CBTExam, StudentTestResult, ChatMessage, LectureItem } from '../types';
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  updateProfile,
+  onAuthStateChanged,
+  type User as FirebaseUser 
+} from 'firebase/auth';
+import type { User, ContentItem, CBTExam, StudentTestResult, ChatMessage, LectureItem, ClassGrade, TargetExam } from '../types';
 
 export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDl6rzcJ-XWE2qz7wacT2RBMZiJD5UTZjI",
@@ -244,3 +252,193 @@ export function subscribeToChatMessages(onUpdate: (messages: ChatMessage[]) => v
     return () => {};
   }
 }
+
+// -------------------------------------------------------------
+// 7. FIREBASE AUTHENTICATION & SECURE CREDENTIAL SERVICES
+// -------------------------------------------------------------
+
+export async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password.trim());
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+export interface RegisterStudentParams {
+  name: string;
+  email: string;
+  password: string;
+  classGrade?: ClassGrade;
+  school?: string;
+  targetExam?: TargetExam;
+  phone?: string;
+}
+
+export interface AuthResult {
+  success: boolean;
+  user?: User;
+  error?: string;
+}
+
+export async function registerStudentWithFirebase(params: RegisterStudentParams): Promise<AuthResult> {
+  const email = params.email.trim().toLowerCase();
+  const password = params.password.trim();
+
+  if (!email || !password) {
+    return { success: false, error: 'Email and password are required.' };
+  }
+  if (password.length < 6) {
+    return { success: false, error: 'Password must be at least 6 characters long.' };
+  }
+
+  const pwdHash = await hashPassword(password);
+  let uid = `std_${Date.now()}`;
+
+  // Attempt Firebase Authentication creation
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    uid = cred.user.uid;
+    if (cred.user && params.name) {
+      try {
+        await updateProfile(cred.user, { displayName: params.name });
+      } catch {
+        // non-fatal
+      }
+    }
+  } catch (err: any) {
+    console.warn('[Firebase Auth] Registration notice:', err.code, err.message);
+    if (err.code === 'auth/email-already-in-use') {
+      return { 
+        success: false, 
+        error: 'This email is already registered! Please switch to the "Student Login" tab to access your account.' 
+      };
+    }
+    if (err.code === 'auth/invalid-email') {
+      return { success: false, error: 'Please provide a valid email address.' };
+    }
+    if (err.code === 'auth/weak-password') {
+      return { success: false, error: 'Password should be at least 6 characters.' };
+    }
+  }
+
+  const newStudent: User = {
+    id: uid,
+    name: params.name.trim(),
+    email: email,
+    role: 'student',
+    passwordHash: pwdHash,
+    classGrade: params.classGrade || 'Class 12',
+    school: params.school || 'EdParth Learning',
+    targetExam: params.targetExam || 'JEE Main/Adv',
+    phone: params.phone || '',
+    avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(params.name)}`,
+    joinedAt: new Date().toISOString().split('T')[0],
+    stats: {
+      testsGiven: 0,
+      studyHours: 0,
+      streakDays: 1,
+      avgScore: 0,
+      xp: 100
+    }
+  };
+
+  await syncStudentToFirestore(newStudent);
+  return { success: true, user: newStudent };
+}
+
+export async function loginStudentWithFirebase(
+  emailInput: string, 
+  passwordInput: string,
+  localStudents: User[]
+): Promise<AuthResult> {
+  const email = emailInput.trim().toLowerCase();
+  const password = passwordInput.trim();
+
+  if (!email || !password) {
+    return { success: false, error: 'Please enter both your email and password.' };
+  }
+
+  const pwdHash = await hashPassword(password);
+
+  // 1. Attempt official Firebase Authentication
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    const uid = cred.user.uid;
+
+    try {
+      const studentSnap = await getDoc(doc(db, 'students', uid));
+      if (studentSnap.exists()) {
+        const studentData = studentSnap.data() as User;
+        return { success: true, user: studentData };
+      }
+    } catch {
+      // ignore
+    }
+
+    const foundByEmail = localStudents.find(s => s.email.toLowerCase() === email);
+    if (foundByEmail) {
+      return { success: true, user: foundByEmail };
+    }
+
+    const newUser: User = {
+      id: uid,
+      name: cred.user.displayName || email.split('@')[0] || 'Student Aspirant',
+      email: email,
+      role: 'student',
+      passwordHash: pwdHash,
+      joinedAt: new Date().toISOString().split('T')[0],
+      stats: { testsGiven: 0, studyHours: 0, streakDays: 1, avgScore: 0, xp: 100 }
+    };
+    await syncStudentToFirestore(newUser);
+    return { success: true, user: newUser };
+
+  } catch (err: any) {
+    console.warn('[Firebase Auth] Login verification notice:', err.code, err.message);
+
+    if (err.code === 'auth/wrong-password') {
+      return { success: false, error: 'Incorrect password! Please verify and try again.' };
+    }
+
+    if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+      // Check if user was registered in Firestore / local database
+      const matched = localStudents.find(s => s.email.toLowerCase() === email);
+      if (!matched) {
+        return { 
+          success: false, 
+          error: 'No account found with this email! Please click "Register" to create your student account first.' 
+        };
+      }
+      if (matched.passwordHash) {
+        if (matched.passwordHash === pwdHash) {
+          return { success: true, user: matched };
+        } else {
+          return { success: false, error: 'Incorrect password! Please verify and try again.' };
+        }
+      }
+    }
+
+    // Fallback: Check local / cloud students database
+    const matched = localStudents.find(s => s.email.toLowerCase() === email);
+    if (!matched) {
+      return { 
+        success: false, 
+        error: 'No account found with this email! Please click "Register" to create your student account first.' 
+      };
+    }
+
+    if (matched.passwordHash && matched.passwordHash !== pwdHash) {
+      return { success: false, error: 'Incorrect password! Please verify and try again.' };
+    }
+
+    return { success: true, user: matched };
+  }
+}
+
+export async function logoutStudentFromFirebase(): Promise<void> {
+  try {
+    await signOut(auth);
+  } catch (err) {
+    console.warn('[Firebase Auth] Signout notice:', err);
+  }
+}
+

@@ -211,14 +211,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
-            <span>Sign Out ({currentUser.name.split(' ')[0]})</span>
+            <span>Logout ({currentUser.name.split(' ')[0]})</span>
           </button>
         ) : (
           <button
             onClick={() => openAuthModal('login')}
             className="w-full py-2.5 rounded-2xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all shadow-sm cursor-pointer"
           >
-            Sign In
+            Login
           </button>
         )}
       </div>

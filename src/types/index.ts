@@ -11,6 +11,7 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  passwordHash?: string;
   classGrade?: ClassGrade;
   school?: string;
   targetExam?: TargetExam;

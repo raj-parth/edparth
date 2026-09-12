@@ -347,7 +347,7 @@ export const StudentHomeView: React.FC<StudentHomeViewProps> = ({
                   {currentUser ? `Welcome, ${currentUser.name}!` : 'Welcome to edparth!'}
                 </h4>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  {currentUser ? `${currentUser.classGrade || 'Class 12'} • Target: ${currentUser.targetExam || 'JEE Main'}` : 'Sign in to track your test rankings'}
+                  {currentUser ? `${currentUser.classGrade || 'Class 12'} • Target: ${currentUser.targetExam || 'JEE Main'}` : 'Login to track your test rankings'}
                 </p>
               </div>
             </div>

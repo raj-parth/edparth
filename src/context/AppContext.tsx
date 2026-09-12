@@ -15,7 +15,8 @@ import {
   syncTestResultToFirestore, 
   subscribeToTestResults,
   syncChatMessageToFirestore, 
-  subscribeToChatMessages
+  subscribeToChatMessages,
+  logoutStudentFromFirebase
 } from '../services/firebase';
 
 const INITIAL_SOCIAL_CHANNELS: SocialChannel[] = [
@@ -462,7 +463,7 @@ interface AppContextType {
   addXP: (amount: number) => void;
   loginUser: (user: User) => void;
   logoutUser: () => void;
-  registerStudent: (studentData: Omit<User, 'id' | 'role' | 'joinedAt' | 'stats'>) => void;
+  registerStudent: (studentData: Omit<User, 'id' | 'role' | 'joinedAt' | 'stats'>, customId?: string) => void;
   addContentItem: (item: Omit<ContentItem, 'id' | 'uploadedAt' | 'downloadsCount'>) => void;
   deleteContentItem: (id: string) => void;
   addCBTExam: (exam: CBTExam) => void;
@@ -732,18 +733,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const logoutUser = () => {
+    logoutStudentFromFirebase();
     setCurrentUser(null);
     sessionStorage.removeItem('edparth_authenticated_session');
     localStorage.removeItem('edparth_current_user');
   };
 
-  const registerStudent = (studentData: Omit<User, 'id' | 'role' | 'joinedAt' | 'stats'>) => {
+  const registerStudent = (studentData: Omit<User, 'id' | 'role' | 'joinedAt' | 'stats'>, customId?: string) => {
     const newStudent: User = {
       ...studentData,
-      id: `std_${Date.now()}`,
+      id: customId || `std_${Date.now()}`,
       role: 'student',
       joinedAt: new Date().toISOString().split('T')[0],
-      avatar: studentData.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${studentData.name}`,
+      avatar: studentData.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(studentData.name)}`,
       stats: {
         testsGiven: 0,
         studyHours: 0,
@@ -753,7 +755,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     };
 
-    setStudents(prev => [newStudent, ...prev]);
+    setStudents(prev => [newStudent, ...prev.filter(s => s.email.toLowerCase() !== newStudent.email.toLowerCase())]);
     setCurrentUser(newStudent);
     syncStudentToFirestore(newStudent);
     closeAuthModal();

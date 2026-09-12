@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Shield, Zap, BookOpen, Sparkles, CheckCircle2, User as UserIcon, Phone, School, Award, ChevronDown, Check } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Shield, Zap, BookOpen, Sparkles, CheckCircle2, User as UserIcon, Phone, School, Award, ChevronDown, Check, Loader2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { Logo } from '../Logo';
 import { verifyAdminCredentials } from '../../utils/auth';
+import { loginStudentWithFirebase, registerStudentWithFirebase } from '../../services/firebase';
 import type { ClassGrade, TargetExam } from '../../types';
 
 export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSuccess }) => {
-  const { loginUser, registerStudent, students, currentUser } = useApp();
+  const { loginUser, students, currentUser } = useApp();
 
   const isSecretAdminUrl = typeof window !== 'undefined' && (
     new URLSearchParams(window.location.search).get('admin') === 'true' ||
@@ -18,6 +19,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
   const [mode, setMode] = useState<'login' | 'signup' | 'admin'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form states
   const [email, setEmail] = useState('');
@@ -35,10 +37,17 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
     const trimmedEmail = email.trim().toLowerCase();
     const trimmedPassword = password.trim();
 
-    // 1. SECURE ADMIN CREDENTIAL VERIFICATION
-    const isAdmin = await verifyAdminCredentials(trimmedEmail, trimmedPassword);
-    if (isAdmin) {
-      setTimeout(() => {
+    if (!trimmedEmail || !trimmedPassword) {
+      setErrorMessage('Please enter both your email and password.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // 1. SECURE ADMIN CREDENTIAL VERIFICATION
+      const isAdmin = await verifyAdminCredentials(trimmedEmail, trimmedPassword);
+      if (isAdmin) {
         loginUser({
           id: 'admin_1',
           name: 'RAJ (Master Admin)',
@@ -49,55 +58,69 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
           stats: { testsGiven: 0, studyHours: 999, streakDays: 100, avgScore: 100, xp: 99999 }
         });
         onAuthSuccess?.();
-      }, 150);
-      return;
-    }
+        return;
+      }
 
-    if (mode === 'admin') {
-      setErrorMessage('Invalid administrative passcode. Please verify credentials.');
-      return;
-    }
+      if (mode === 'admin') {
+        setErrorMessage('Invalid administrative passcode. Please verify credentials.');
+        return;
+      }
 
-    // 2. STUDENT LOGIN
-    const found = students.find(s => s.email.toLowerCase() === trimmedEmail);
-    if (found) {
-      setTimeout(() => {
-        loginUser(found);
-        onAuthSuccess?.();
-      }, 150);
-    } else {
-      // Auto-register student if logging in with valid email
-      const newStudent = {
-        name: email.split('@')[0] || 'Student Aspirant',
-        email: email.trim(),
-        phone: phone || '+91 98765 43210',
-        school: school || 'Kendriya Vidyalaya / DPS',
-        classGrade: classGrade,
-        targetExam: targetExam
-      };
-      registerStudent(newStudent);
+      // 2. REAL FIREBASE STUDENT AUTHENTICATION
+      const result = await loginStudentWithFirebase(trimmedEmail, trimmedPassword, students);
+      if (!result.success || !result.user) {
+        setErrorMessage(result.error || 'Authentication failed. Please verify your credentials.');
+        return;
+      }
+
+      loginUser(result.user);
       onAuthSuccess?.();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Login error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleStudentSignup = (e: React.FormEvent) => {
+  const handleStudentSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim()) {
-      setErrorMessage('Please provide your full name and valid email address.');
+    setErrorMessage('');
+
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      setErrorMessage('Please provide your full name, valid email, and set a password.');
       return;
     }
 
-    setTimeout(() => {
-      registerStudent({
+    if (password.trim().length < 6) {
+      setErrorMessage('Password must be at least 6 characters long.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await registerStudentWithFirebase({
         name: name.trim(),
         email: email.trim(),
-        phone: phone.trim() || '+91 98765 00000',
-        school: school.trim() || 'Central High School',
+        password: password.trim(),
         classGrade,
-        targetExam
+        targetExam,
+        school: school.trim() || 'EdParth Student',
+        phone: phone.trim()
       });
+
+      if (!result.success || !result.user) {
+        setErrorMessage(result.error || 'Registration failed. Please try again.');
+        return;
+      }
+
+      loginUser(result.user);
       onAuthSuccess?.();
-    }, 150);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Registration error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -219,7 +242,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
               )}
 
               {/* Top Mode Switcher */}
-              <div className="p-1 bg-slate-950 rounded-2xl border border-slate-800 flex items-center">
+              <div className="p-1 bg-slate-950 rounded-2xl border border-slate-800 flex items-center mb-5">
                 <button
                   type="button"
                   onClick={() => { setMode('login'); setErrorMessage(''); }}
@@ -229,7 +252,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  Student Sign In
+                  Student Login
                 </button>
 
                 <button
@@ -241,7 +264,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  Create Account
+                  Register (New Student)
                 </button>
 
                 {isAdminUnlocked && (
@@ -261,12 +284,33 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
 
               {/* Error Notice */}
               {errorMessage && (
-                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-medium">
-                  {errorMessage}
+                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-medium mb-4 flex flex-col gap-2">
+                  <div className="flex items-start gap-2">
+                    <span className="shrink-0 mt-0.5">⚠️</span>
+                    <span>{errorMessage}</span>
+                  </div>
+                  {errorMessage.includes('Register') && mode === 'login' && (
+                    <button
+                      type="button"
+                      onClick={() => { setMode('signup'); setErrorMessage(''); }}
+                      className="self-start text-[11px] font-bold text-[#ff6a00] hover:underline cursor-pointer flex items-center gap-1"
+                    >
+                      Click here to Register new account &rarr;
+                    </button>
+                  )}
+                  {errorMessage.includes('Login') && mode === 'signup' && (
+                    <button
+                      type="button"
+                      onClick={() => { setMode('login'); setErrorMessage(''); }}
+                      className="self-start text-[11px] font-bold text-[#ff6a00] hover:underline cursor-pointer flex items-center gap-1"
+                    >
+                      Click here to Login &rarr;
+                    </button>
+                  )}
                 </div>
               )}
 
-              {/* Sign In & Admin Form */}
+              {/* Login & Admin Form */}
               {(mode === 'login' || mode === 'admin') && (
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div>
@@ -294,8 +338,8 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                       {mode === 'login' && (
                         <button
                           type="button"
-                          onClick={() => setErrorMessage('For password recovery assistance, please reach out to support@edparth.com or your institute administrator.')}
-                          className="text-[11px] text-[#ff6a00] hover:underline"
+                          onClick={() => setErrorMessage('For password assistance, please register or contact support@edparth.com.')}
+                          className="text-[11px] text-[#ff6a00] hover:underline cursor-pointer"
                         >
                           Forgot?
                         </button>
@@ -314,7 +358,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -323,15 +367,40 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
 
                   <button
                     type="submit"
-                    className="w-full py-3.5 rounded-xl bg-[#ff6a00] hover:bg-[#ea580c] text-white font-black text-xs sm:text-sm tracking-wide transition-all shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 cursor-pointer mt-2"
+                    disabled={isSubmitting}
+                    className="w-full py-3.5 rounded-xl bg-[#ff6a00] hover:bg-[#ea580c] disabled:opacity-60 text-white font-black text-xs sm:text-sm tracking-wide transition-all shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 cursor-pointer mt-2"
                   >
-                    <span>{mode === 'admin' ? 'Verify & Access Admin Console' : 'Sign In to Your Account'}</span>
-                    <ArrowRight className="w-4 h-4" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Verifying Credentials...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{mode === 'admin' ? 'Verify & Access Admin Console' : 'Login to EdParth'}</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
                   </button>
+
+                  {mode === 'login' && (
+                    <div className="pt-2 text-center">
+                      <p className="text-xs text-slate-400">
+                        New student?{' '}
+                        <button
+                          type="button"
+                          onClick={() => { setMode('signup'); setErrorMessage(''); }}
+                          className="text-[#ff6a00] font-bold hover:underline cursor-pointer"
+                        >
+                          Register here &rarr;
+                        </button>
+                      </p>
+                    </div>
+                  )}
                 </form>
               )}
 
-              {/* Sign Up Form */}
+              {/* Sign Up / Register Form */}
               {mode === 'signup' && (
                 <form onSubmit={handleStudentSignup} className="space-y-3.5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -419,7 +488,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Set Password *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">Set Password * (Min. 6 characters)</label>
                     <input
                       type="password"
                       required
@@ -432,11 +501,34 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
 
                   <button
                     type="submit"
-                    className="w-full py-3.5 rounded-xl bg-[#ff6a00] hover:bg-[#ea580c] text-white font-black text-xs sm:text-sm tracking-wide transition-all shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 cursor-pointer mt-2"
+                    disabled={isSubmitting}
+                    className="w-full py-3.5 rounded-xl bg-[#ff6a00] hover:bg-[#ea580c] disabled:opacity-60 text-white font-black text-xs sm:text-sm tracking-wide transition-all shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 cursor-pointer mt-2"
                   >
-                    <span>Create Free Student Account</span>
-                    <ArrowRight className="w-4 h-4" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Registering Account...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Create Free Student Account</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
                   </button>
+
+                  <div className="pt-2 text-center">
+                    <p className="text-xs text-slate-400">
+                      Already registered?{' '}
+                      <button
+                        type="button"
+                        onClick={() => { setMode('login'); setErrorMessage(''); }}
+                        className="text-[#ff6a00] font-bold hover:underline cursor-pointer"
+                      >
+                        Login here &rarr;
+                      </button>
+                    </p>
+                  </div>
                 </form>
               )}
 
