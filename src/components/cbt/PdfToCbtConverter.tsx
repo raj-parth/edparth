@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { UploadCloud, FileText, Sparkles, Plus, Trash2, Image, Play, Eye, FileCheck } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import type { CBTExam, CBTQuestion } from '../../types';
-import confetti from 'canvas-confetti';
 
 interface PdfToCbtConverterProps {
   onTestPublished?: (exam: CBTExam) => void;
@@ -224,11 +223,6 @@ Explanation: Let t = x e^x => dt = (x e^x + e^x) dx = e^x(1 + x) dx. Thus ∫ dt
     };
 
     addCBTExam(newExam);
-    confetti({
-      particleCount: 100,
-      spread: 80,
-      origin: { y: 0.6 }
-    });
 
     if (onTestPublished) {
       onTestPublished(newExam);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { IntroScreen } from './components/IntroScreen';
 import { Sidebar } from './components/Sidebar';
@@ -18,6 +18,7 @@ import { AuthModal } from './components/AuthModal';
 import { Footer } from './components/Footer';
 import { Logo } from './components/Logo';
 import { AnalyticsTab } from './components/admin/AnalyticsTab';
+import { recordPageView } from './utils/analytics';
 
 export type ActiveViewType = 'home' | 'cbt-list' | 'lectures' | 'library' | 'chat' | 'doubts' | 'dashboard' | 'admin' | 'analytics';
 
@@ -36,6 +37,22 @@ const MainApp: React.FC = () => {
   const [isAuthenticatedSession, setIsAuthenticatedSession] = useState<boolean>(() => {
     return sessionStorage.getItem('edparth_authenticated_session') === 'true';
   });
+
+  // Track real section pageview
+  useEffect(() => {
+    const pageTitles: Record<string, string> = {
+      'home': 'Study Suite Home',
+      'cbt-list': 'CBT Mock Tests',
+      'lectures': 'JEE YouTube Lectures',
+      'library': 'Study Material Vault',
+      'chat': 'Student Community & Chat',
+      'doubts': '24/7 AI Doubt Engine',
+      'dashboard': 'Student Rank & Stats',
+      'admin': 'Admin Console',
+      'analytics': 'Admin Analytics'
+    };
+    recordPageView(pageTitles[activeView] || activeView);
+  }, [activeView]);
 
   // 1. First time or initial visit: Show Intro Anime Portal Screen
   if (!hasSeenIntro) {
@@ -139,7 +156,7 @@ const MainApp: React.FC = () => {
             <AdminDashboard />
           )}
 
-          {activeView === 'analytics' && (
+          {activeView === 'analytics' && currentUser?.role === 'admin' && (
             <div className="p-4 sm:p-8 max-w-[1600px] mx-auto">
               <AnalyticsTab />
             </div>

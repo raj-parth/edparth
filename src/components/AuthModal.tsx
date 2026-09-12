@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Eye, EyeOff, Mail, Lock, ArrowRight, Shield, Zap, BookOpen, MessageSquare, Tv, Sparkles, CheckCircle2, User as UserIcon, Phone, School, Award } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Logo } from './Logo';
+import { verifyAdminCredentials } from '../utils/auth';
 import type { ClassGrade, TargetExam } from '../types';
 
 export const AuthModal: React.FC = () => {
@@ -30,20 +31,21 @@ export const AuthModal: React.FC = () => {
 
   if (!isAuthModalOpen) return null;
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
     const trimmedEmail = email.trim().toLowerCase();
     const trimmedPassword = password.trim();
 
-    // 1. SECRET ADMIN LOGIN
-    if (trimmedEmail === 'parthverse0@gmail.com' && trimmedPassword === 'mos2026rk') {
+    // 1. SECURE ADMIN CREDENTIAL VERIFICATION
+    const isAdmin = await verifyAdminCredentials(trimmedEmail, trimmedPassword);
+    if (isAdmin) {
       setTimeout(() => {
         loginUser({
           id: 'admin_1',
           name: 'RAJ (Master Admin)',
-          email: 'parthverse0@gmail.com',
+          email: trimmedEmail,
           role: 'admin',
           avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
           joinedAt: '2026-01-01',

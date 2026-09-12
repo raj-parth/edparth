@@ -25,8 +25,19 @@ export const SecurityGuard: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   useEffect(() => {
-    // 1. Right Click Prevention
+    // 1. Right Click Prevention (whitelisting form inputs/textareas)
     const handleContextMenu = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+         target.tagName === 'TEXTAREA' ||
+         target.isContentEditable ||
+         target.closest('input, textarea, [contenteditable="true"]'))
+      ) {
+        return; // Permit context menu for copy, paste, and text selection in inputs
+      }
+
       e.preventDefault();
       triggerSecurityAlert(
         'EdParth DRM Protection: Right-click is disabled to protect proprietary study material & question papers.',

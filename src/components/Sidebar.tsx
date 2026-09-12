@@ -128,25 +128,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <MessageSquare className={`w-4 h-4 ${activeView === 'chat' ? 'text-indigo-600' : 'text-slate-400'}`} />
                 <span>Community & Chats</span>
               </button>
-
-              {/* Live Visitor Analytics Button */}
-              <button
-                onClick={() => setActiveView('analytics')}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  activeView === 'analytics'
-                    ? 'bg-indigo-50 text-indigo-700 shadow-xs font-black'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <BarChart3 className={`w-4 h-4 ${activeView === 'analytics' ? 'text-indigo-600' : 'text-[#ff6a00]'}`} />
-                  <span>Visitor Analytics</span>
-                </div>
-                <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-700 text-[9px] font-black tracking-wide">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  LIVE
-                </span>
-              </button>
             </nav>
           </div>
         </div>

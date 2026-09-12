@@ -33,8 +33,8 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   const [showStreakTooltip, setShowStreakTooltip] = useState(false);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
-  const streakDays = currentUser?.stats?.streakDays || 7;
-  const xpPoints = currentUser?.stats?.xp || 1450;
+  const streakDays = currentUser?.stats?.streakDays ?? 0;
+  const xpPoints = currentUser?.stats?.xp ?? 0;
 
   return (
     <>
@@ -120,20 +120,6 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             className="w-10 h-10 rounded-2xl bg-[#f8fafc] hover:bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
           >
             <Shield className="w-4 h-4 text-[#ff6a00]" />
-          </button>
-
-          {/* Live Visitor Analytics Header Button */}
-          <button
-            onClick={() => onNavigate && onNavigate('analytics')}
-            title="View Live Traffic & Visitors"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 transition-all cursor-pointer shadow-2xs"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <BarChart3 className="w-3.5 h-3.5 text-indigo-600" />
-            <span className="text-xs font-black text-indigo-950 hidden sm:inline">Live Visitors</span>
           </button>
 
           {/* Notification Bell */}

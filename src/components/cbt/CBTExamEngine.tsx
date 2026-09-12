@@ -4,7 +4,6 @@ import { Clock, AlertTriangle, CheckCircle2, XCircle, ArrowRight, ArrowLeft, Rot
 import { CBTExam, QuestionStatus, StudentTestResult } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { WatermarkOverlay } from '../security/WatermarkOverlay';
-import confetti from 'canvas-confetti';
 
 interface CBTExamEngineProps {
   exam: CBTExam;
@@ -176,12 +175,6 @@ export const CBTExamEngine: React.FC<CBTExamEngineProps> = ({ exam, onExit }) =>
     setTestResult(result);
     setIsTestSubmitted(true);
     submitTestResult(result);
-
-    confetti({
-      particleCount: 120,
-      spread: 90,
-      origin: { y: 0.5 }
-    });
   };
 
   // Status counters for palette

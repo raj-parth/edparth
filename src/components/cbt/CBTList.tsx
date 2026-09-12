@@ -10,7 +10,7 @@ interface CBTListProps {
 }
 
 export const CBTList: React.FC<CBTListProps> = ({ onStartExam, onOpenConverter }) => {
-  const { exams, currentUser } = useApp();
+  const { exams, currentUser, testResults } = useApp();
 
   const [search, setSearch] = useState('');
   const [selectedExamFilter, setSelectedExamFilter] = useState('All');
@@ -94,9 +94,14 @@ export const CBTList: React.FC<CBTListProps> = ({ onStartExam, onOpenConverter }
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-50 text-indigo-700">
                   {exam.targetExam}
                 </span>
-                <span className="text-[11px] text-slate-400 font-mono">
-                  {exam.attemptsCount} attempts
-                </span>
+                {(() => {
+                  const attempts = testResults.filter(r => r.examId === exam.id).length;
+                  return (
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      {attempts > 0 ? `${attempts} ${attempts === 1 ? 'attempt' : 'attempts'}` : 'Ready to attempt'}
+                    </span>
+                  );
+                })()}
               </div>
 
               <h3 className="font-extrabold text-base sm:text-lg text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug">

@@ -13,7 +13,7 @@ const INITIAL_SOCIAL_CHANNELS: SocialChannel[] = [
     bannerUrl: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&auto=format&fit=crop&q=80',
     linkUrl: 'https://youtube.com',
     badge: 'Verified Faculty',
-    stats: '120k Students',
+    stats: 'Physics Hub',
     videos: [
       {
         id: 'v1',
@@ -46,7 +46,7 @@ const INITIAL_SOCIAL_CHANNELS: SocialChannel[] = [
     bannerUrl: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&auto=format&fit=crop&q=80',
     linkUrl: 'https://youtube.com',
     badge: 'Official Medical Hub',
-    stats: '95k Aspirants',
+    stats: 'Medical Hub',
     videos: [
       {
         id: 'v4',
@@ -73,7 +73,7 @@ const INITIAL_SOCIAL_CHANNELS: SocialChannel[] = [
     bannerUrl: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&auto=format&fit=crop&q=80',
     linkUrl: 'https://youtube.com',
     badge: 'Top Educator',
-    stats: '80k Learners',
+    stats: 'Calculus Series',
     videos: [
       {
         id: 'v6',
@@ -142,7 +142,7 @@ const INITIAL_EXAMS: CBTExam[] = [
     ],
     createdBy: 'Admin (RAJ)',
     createdAt: '2026-09-01',
-    attemptsCount: 142,
+    attemptsCount: 0,
     questions: [
       {
         id: 1,
@@ -252,12 +252,12 @@ const INITIAL_CONTENT: ContentItem[] = [
     type: 'book',
     category: 'JEE',
     subject: 'Physics',
-    fileUrl: 'https://example.com/hcv-notes.pdf',
+    fileUrl: 'https://t.me/edparthbooks',
     fileSize: '18.5 MB',
     thumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&auto=format&fit=crop&q=80',
     uploadedBy: 'Raj (Admin)',
     uploadedAt: '2026-09-01',
-    downloadsCount: 184,
+    downloadsCount: 0,
     pagesCount: 320,
     tags: ['Physics', 'JEE Main', 'HC Verma']
   },
@@ -268,12 +268,12 @@ const INITIAL_CONTENT: ContentItem[] = [
     type: 'notes',
     category: 'NEET',
     subject: 'Biology',
-    fileUrl: 'https://example.com/ncert-bio.pdf',
+    fileUrl: 'https://t.me/edparthbooks',
     fileSize: '14.2 MB',
     thumbnail: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400&auto=format&fit=crop&q=80',
     uploadedBy: 'Raj (Admin)',
     uploadedAt: '2026-09-02',
-    downloadsCount: 240,
+    downloadsCount: 0,
     pagesCount: 190,
     tags: ['NEET', 'Biology', 'NCERT']
   }
@@ -282,25 +282,25 @@ const INITIAL_CONTENT: ContentItem[] = [
 const INITIAL_NOTIFICATIONS: SystemNotification[] = [
   {
     id: 'n1',
-    title: 'New CBT Mock Test Live',
-    message: 'JEE Main Full Syllabus Test Series #3 is now open with full NTA proctored simulator.',
-    time: '15m ago',
+    title: 'CBT Mock Test Portal Ready',
+    message: 'JEE Main Full Syllabus Test Series #1 is available with official NTA-standard marking scheme.',
+    time: 'Recent',
     type: 'test',
     isRead: false
   },
   {
     id: 'n2',
-    title: 'Rotational Dynamics Lecture & DPP Added',
-    message: 'One-shot lecture notes & 10 high-yield DPP questions are available in YouTube Hub.',
-    time: '2h ago',
+    title: 'Rotational Dynamics Masterclass & DPP',
+    message: 'Physics masterclass notes and companion practice problem sets are available in the Lectures hub.',
+    time: 'Recent',
     type: 'lecture',
     isRead: false
   },
   {
     id: 'n3',
-    title: '256-Bit Dynamic DRM Watermark Active',
-    message: 'Your study session is secured with automated content protection and anti-recording safeguards.',
-    time: '1d ago',
+    title: 'EdParth DRM & Integrity Protection Active',
+    message: 'Dynamic watermarking and anti-copy protections are enabled for your learning session.',
+    time: 'System',
     type: 'security',
     isRead: true
   }

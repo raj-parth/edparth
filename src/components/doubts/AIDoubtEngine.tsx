@@ -20,7 +20,7 @@ const INITIAL_SOLVED_DOUBTS: AIDoubtItem[] = [
       'Step 5: Simplify to obtain: E(r) = (1 / 4πε₀) · (Q · r / R³), which is directly proportional to r.'
     ],
     suggestedTopic: 'Electrostatics & Gauss Law (Class 12 / JEE / NEET)',
-    askedAt: '10 mins ago',
+    askedAt: 'Reference Solution',
     isBookmarked: false
   },
   {
@@ -34,10 +34,10 @@ const INITIAL_SOLVED_DOUBTS: AIDoubtItem[] = [
       'Step 1: In both complexes, Iron is in +3 oxidation state: Fe³⁺ has electronic configuration [Ar] 3d⁵.',
       'Step 2: With H₂O (weak ligand), crystal field splitting energy Δo is smaller than pairing energy P. Electrons enter t₂g³ eg² configuration (n = 5 unpaired electrons, μ = 5.92 B.M.).',
       'Step 3: With CN⁻ (strong ligand), Δo > P. Electrons are forced to pair in lower energy orbitals: t₂g⁵ eg⁰ (n = 1 unpaired electron, μ = 1.73 B.M.).',
-      'Step 4: Conclusion: [Fe(H2O)6]3+ is high spin (strongly paramagnetic), while [Fe(CN)6]3- is low spin (weakly paramagnetic).'
+      'Step 4: Conclusion: [Fe(H2O)6]3+ is high spin (strongly paramagnetic), while [Fe(CN)6]3- is low spin (weakly paramagnetic).',
     ],
     suggestedTopic: 'Coordination Compounds & Crystal Field Theory (Class 12 / NEET)',
-    askedAt: '25 mins ago',
+    askedAt: 'Standard NCERT',
     isBookmarked: true
   },
   {
@@ -55,7 +55,7 @@ const INITIAL_SOLVED_DOUBTS: AIDoubtItem[] = [
       'Step 5: 2I = [x] from 0 to π/2 = π/2 => I = π/4.'
     ],
     suggestedTopic: 'Definite Integration Properties (Class 12 / JEE Main)',
-    askedAt: '1 hour ago',
+    askedAt: 'PYQ Archive',
     isBookmarked: false
   }
 ];

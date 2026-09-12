@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Shield, Zap, BookOpen, Sparkles, CheckCircle2, User as UserIcon, Phone, School, Award, ChevronDown, Check } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { Logo } from '../Logo';
+import { verifyAdminCredentials } from '../../utils/auth';
 import type { ClassGrade, TargetExam } from '../../types';
 
 export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSuccess }) => {
@@ -20,15 +21,16 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
   const [classGrade, setClassGrade] = useState<ClassGrade>('Class 12');
   const [targetExam, setTargetExam] = useState<TargetExam>('JEE Main/Adv');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
     const trimmedEmail = email.trim().toLowerCase();
     const trimmedPassword = password.trim();
 
-    // 1. SECRET ADMIN CREDENTIALS
-    if (trimmedEmail === 'parthverse0@gmail.com' && trimmedPassword === 'mos2026rk') {
+    // 1. SECURE ADMIN CREDENTIAL VERIFICATION
+    const isAdmin = await verifyAdminCredentials(trimmedEmail, trimmedPassword);
+    if (isAdmin) {
       setTimeout(() => {
         loginUser({
           id: 'admin_1',
@@ -89,13 +91,6 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
       });
       onAuthSuccess?.();
     }, 150);
-  };
-
-  const autofillAdmin = () => {
-    setEmail('parthverse0@gmail.com');
-    setPassword('mos2026rk');
-    setMode('admin');
-    setErrorMessage('');
   };
 
   return (
@@ -186,7 +181,12 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
             {/* Admin Console Shortcut */}
             <div className="pt-2 flex items-center gap-2">
               <button
-                onClick={autofillAdmin}
+                onClick={() => {
+                  setMode('admin');
+                  setEmail('parthverse0@gmail.com');
+                  setPassword('');
+                  setErrorMessage('');
+                }}
                 className="px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-[11px] font-bold text-[#ff6a00] hover:text-amber-400 transition-colors cursor-pointer flex items-center gap-1.5"
               >
                 <Shield className="w-3.5 h-3.5" />
@@ -301,7 +301,7 @@ export const AuthPage: React.FC<{ onAuthSuccess?: () => void }> = ({ onAuthSucce
                       {mode === 'login' && (
                         <button
                           type="button"
-                          onClick={() => alert('Demo account: Use any password or click "Fill Student Demo"')}
+                          onClick={() => setErrorMessage('For password recovery assistance, please reach out to support@edparth.com or your institute administrator.')}
                           className="text-[11px] text-[#ff6a00] hover:underline"
                         >
                           Forgot?

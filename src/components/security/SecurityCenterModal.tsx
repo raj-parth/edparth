@@ -17,7 +17,7 @@ export const SecurityCenterModal: React.FC<SecurityCenterModalProps> = ({
   if (!isOpen) return null;
 
   const sessionToken = currentUser ? `EP-AUTH-${btoa(currentUser.id + currentUser.email).slice(0, 18).toUpperCase()}` : 'EP-GUEST-SECURE';
-  const ipAddress = '103.248.112.44 (New Delhi, IN - Verified ISP)';
+  const connectionDetails = `HTTPS / TLS 1.3 Direct (${window.location.hostname || 'edparth.com'})`;
 
   const handleRevokeOtherSessions = () => {
     setSessionRevoked(true);
@@ -111,8 +111,8 @@ export const SecurityCenterModal: React.FC<SecurityCenterModalProps> = ({
                 <span className="text-slate-200 font-bold">{currentUser?.name || 'Guest Explorer'}</span>
               </div>
               <div className="sm:col-span-2">
-                <span className="text-slate-500 block">Encrypted Gateway IP:</span>
-                <span className="text-slate-300">{ipAddress}</span>
+                <span className="text-slate-500 block">Verified Transport Layer:</span>
+                <span className="text-slate-300">{connectionDetails}</span>
               </div>
             </div>
           </div>

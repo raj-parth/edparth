@@ -1,7 +1,6 @@
 import React from 'react';
 import { Award, Flame, Zap, MessageSquare, Target, School, Mail, BarChart3, BookOpen, Trophy, Shield, CheckCircle2, ArrowRight, Coins, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { ParthAvatar } from '../ParthAvatar';
 
 interface StudentDashboardProps {
   onStartCbtClick: () => void;

@@ -1,0 +1,6 @@
+# EdParth Robots Configuration
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://edparth.com/sitemap.xml

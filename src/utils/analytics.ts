@@ -21,130 +21,47 @@ export interface AnalyticsSummary {
   recentVisitors: VisitorLog[];
 }
 
-const STORAGE_KEY = 'edparth_visitor_logs_v1';
+const STORAGE_KEY = 'edparth_visitor_logs_v2';
+const VIEWS_KEY = 'edparth_real_pageviews';
+const PAGE_COUNTS_KEY = 'edparth_real_page_counts';
 const GA_KEY = 'edparth_ga_measurement_id';
-
-// Default initial realistic sample logs if none exist yet
-const INITIAL_LOGS: VisitorLog[] = [
-  {
-    id: 'vis_1',
-    timestamp: '2 mins ago',
-    city: 'Kota',
-    state: 'Rajasthan',
-    country: 'India',
-    device: 'Mobile',
-    browser: 'Chrome Mobile',
-    source: 'Telegram',
-    pageViewed: 'JEE YouTube Lectures'
-  },
-  {
-    id: 'vis_2',
-    timestamp: '7 mins ago',
-    city: 'New Delhi',
-    state: 'Delhi',
-    country: 'India',
-    device: 'Desktop',
-    browser: 'Chrome',
-    source: 'YouTube',
-    pageViewed: 'NTA CBT Exam Simulator'
-  },
-  {
-    id: 'vis_3',
-    timestamp: '15 mins ago',
-    city: 'Patna',
-    state: 'Bihar',
-    country: 'India',
-    device: 'Mobile',
-    browser: 'Samsung Internet',
-    source: 'Instagram',
-    pageViewed: 'Study Material Vault'
-  },
-  {
-    id: 'vis_4',
-    timestamp: '28 mins ago',
-    city: 'Jaipur',
-    state: 'Rajasthan',
-    country: 'India',
-    device: 'Mobile',
-    browser: 'Chrome Mobile',
-    source: 'WhatsApp',
-    pageViewed: '24/7 AI Doubt Engine'
-  },
-  {
-    id: 'vis_5',
-    timestamp: '42 mins ago',
-    city: 'Lucknow',
-    state: 'Uttar Pradesh',
-    country: 'India',
-    device: 'Desktop',
-    browser: 'Edge',
-    source: 'Direct',
-    pageViewed: 'JEE YouTube Lectures'
-  },
-  {
-    id: 'vis_6',
-    timestamp: '1 hour ago',
-    city: 'Indore',
-    state: 'Madhya Pradesh',
-    country: 'India',
-    device: 'Mobile',
-    browser: 'Chrome Mobile',
-    source: 'Telegram',
-    pageViewed: 'NTA CBT Exam Simulator'
-  },
-  {
-    id: 'vis_7',
-    timestamp: '1.5 hours ago',
-    city: 'Hyderabad',
-    state: 'Telangana',
-    country: 'India',
-    device: 'Desktop',
-    browser: 'Chrome',
-    source: 'Google',
-    pageViewed: 'JEE Main Mock Test Series'
-  },
-  {
-    id: 'vis_8',
-    timestamp: '2 hours ago',
-    city: 'Mumbai',
-    state: 'Maharashtra',
-    country: 'India',
-    device: 'Mobile',
-    browser: 'Safari Mobile',
-    source: 'Instagram',
-    pageViewed: 'Student Dashboard'
-  }
-];
 
 export function getVisitorLogs(): VisitorLog[] {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
       return JSON.parse(saved);
-    } catch (e) {
-      console.error(e);
+    } catch {
+      return [];
     }
   }
-  return INITIAL_LOGS;
+  return [];
 }
 
 export function recordPageView(pageName: string) {
   try {
-    const logs = getVisitorLogs();
+    // 1. Increment total real pageviews
+    const currentViews = parseInt(localStorage.getItem(VIEWS_KEY) || '0', 10);
+    localStorage.setItem(VIEWS_KEY, String(currentViews + 1));
 
-    // Detect device
+    // 2. Track page specific view count
+    const rawCounts = localStorage.getItem(PAGE_COUNTS_KEY);
+    const pageCounts: Record<string, number> = rawCounts ? JSON.parse(rawCounts) : {};
+    pageCounts[pageName] = (pageCounts[pageName] || 0) + 1;
+    localStorage.setItem(PAGE_COUNTS_KEY, JSON.stringify(pageCounts));
+
+    // 3. Detect device & browser
     const ua = navigator.userAgent;
     let device: 'Mobile' | 'Desktop' | 'Tablet' = 'Desktop';
     if (/iPad|Tablet|PlayBook/i.test(ua)) device = 'Tablet';
     else if (/Mobile|Android|iP(hone|od)/i.test(ua)) device = 'Mobile';
 
-    // Detect browser
     let browser = 'Chrome';
     if (ua.includes('Firefox')) browser = 'Firefox';
     else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
     else if (ua.includes('Edg')) browser = 'Edge';
 
-    // Detect source
+    // 4. Detect referrer source
     const referrer = document.referrer.toLowerCase();
     const urlParams = new URLSearchParams(window.location.search);
     const refParam = urlParams.get('ref') || urlParams.get('utm_source');
@@ -160,11 +77,12 @@ export function recordPageView(pageName: string) {
     else if (referrer.includes('instagram.com')) source = 'Instagram';
     else if (referrer.includes('google.com')) source = 'Google';
 
+    const logs = getVisitorLogs();
     const newLog: VisitorLog = {
       id: `vis_${Date.now()}`,
-      timestamp: 'Just now',
-      city: 'Current Visitor',
-      state: 'Live Session',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      city: 'Local Session',
+      state: 'Active',
       country: 'India',
       device,
       browser,
@@ -172,69 +90,62 @@ export function recordPageView(pageName: string) {
       pageViewed: pageName
     };
 
-    const updated = [newLog, ...logs.slice(0, 99)];
+    const updated = [newLog, ...logs.slice(0, 49)];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-  } catch (e) {
-    console.error('Analytics record error', e);
+  } catch {
+    // Silent fail in privacy/storage-restricted environments
   }
 }
 
 export function getAnalyticsSummary(): AnalyticsSummary {
   const logs = getVisitorLogs();
+  const totalPageviews = parseInt(localStorage.getItem(VIEWS_KEY) || String(logs.length), 10);
+  const uniqueVisitors = logs.length > 0 ? 1 : 0;
+  const activeNow = 1; // Real single active student session
 
-  const totalPageviews = logs.length * 3 + 1420; // Base historical estimate + logged views
-  const uniqueVisitors = Math.round(totalPageviews * 0.42);
-  const activeNow = Math.floor(Math.random() * 8) + 4; // 4-11 live users
+  // Real page counts from storage
+  let rawCounts: Record<string, number> = {};
+  try {
+    const saved = localStorage.getItem(PAGE_COUNTS_KEY);
+    if (saved) rawCounts = JSON.parse(saved);
+  } catch {
+    rawCounts = {};
+  }
 
-  // Cities count
-  const cityMap: Record<string, number> = {
-    'Kota (Rajasthan)': 420,
-    'New Delhi (Delhi)': 310,
-    'Patna (Bihar)': 260,
-    'Jaipur (Rajasthan)': 195,
-    'Lucknow (UP)': 165,
-    'Indore (MP)': 120,
-    'Hyderabad (Telangana)': 95,
-    'Mumbai (Maharashtra)': 85
-  };
+  const topPages = Object.entries(rawCounts).map(([page, views]) => ({
+    page,
+    views
+  })).sort((a, b) => b.views - a.views);
 
-  const totalCityVisits = Object.values(cityMap).reduce((a, b) => a + b, 0);
-  const topCities = Object.entries(cityMap).map(([city, visits]) => ({
-    city,
-    visits,
-    percentage: Math.round((visits / totalCityVisits) * 100)
+  // Group real devices
+  const deviceCounts: Record<string, number> = {};
+  logs.forEach(l => {
+    deviceCounts[l.device] = (deviceCounts[l.device] || 0) + 1;
+  });
+  const totalDev = logs.length || 1;
+  const devices = Object.entries(deviceCounts).map(([device, count]) => ({
+    device,
+    count,
+    percentage: Math.round((count / totalDev) * 100)
   }));
 
-  // Sources count
-  const sources = [
-    { source: 'YouTube (@edparth & faculty)', visits: 540, percentage: 38 },
-    { source: 'Telegram Groups & Vault', visits: 380, percentage: 27 },
-    { source: 'Direct / Bookmarks', visits: 250, percentage: 18 },
-    { source: 'Instagram Stories & Bio', visits: 160, percentage: 11 },
-    { source: 'WhatsApp / Friends Share', visits: 90, percentage: 6 }
-  ];
-
-  // Devices breakdown
-  const devices = [
-    { device: 'Android Mobile', count: 965, percentage: 68 },
-    { device: 'Windows Desktop / PC', count: 340, percentage: 24 },
-    { device: 'iPhone / iPad (iOS)', count: 115, percentage: 8 }
-  ];
-
-  // Top Pages
-  const topPages = [
-    { page: 'JEE YouTube Lectures Directory', views: 820 },
-    { page: 'NTA CBT Exam Simulator (All Tests)', views: 640 },
-    { page: '24/7 AI Doubt Engine', views: 490 },
-    { page: 'Study Material Vault & DPPs', views: 370 },
-    { page: 'Student Analytics Dashboard', views: 280 }
-  ];
+  // Group real sources
+  const sourceCounts: Record<string, number> = {};
+  logs.forEach(l => {
+    sourceCounts[l.source] = (sourceCounts[l.source] || 0) + 1;
+  });
+  const totalSrc = logs.length || 1;
+  const sources = Object.entries(sourceCounts).map(([source, visits]) => ({
+    source,
+    visits,
+    percentage: Math.round((visits / totalSrc) * 100)
+  }));
 
   return {
     totalPageviews,
     uniqueVisitors,
     activeNow,
-    topCities,
+    topCities: [],
     sources,
     devices,
     topPages,

@@ -59,7 +59,15 @@ export const AdminDashboard: React.FC = () => {
   const [chanBannerUrl, setChanBannerUrl] = useState('');
   const [chanLinkUrl, setChanLinkUrl] = useState('');
   const [chanBadge, setChanBadge] = useState('Official Partner');
-  const [chanStats, setChanStats] = useState('50k+ Members');
+  const [chanStats, setChanStats] = useState('Study Community');
+  const [successToast, setSuccessToast] = useState<string | null>(null);
+
+  const showNotification = (msg: string) => {
+    setSuccessToast(msg);
+    setTimeout(() => {
+      setSuccessToast(null);
+    }, 4000);
+  };
 
   const filteredStudents = students.filter(std => {
     const matchesSearch = std.name.toLowerCase().includes(studentSearch.toLowerCase()) ||
@@ -92,7 +100,7 @@ export const AdminDashboard: React.FC = () => {
     setNewTitle('');
     setNewDesc('');
     setNewFileUrl('');
-    alert('Content item uploaded successfully!');
+    showNotification('Study material published successfully to repository.');
   };
 
   const handleAddLecture = (e: React.FormEvent) => {
@@ -119,7 +127,7 @@ export const AdminDashboard: React.FC = () => {
 
     setLecTitle('');
     setLecUrl('');
-    alert('YouTube Lecture added successfully!');
+    showNotification('Video lecture indexed successfully in library.');
   };
 
   const handleAddSocialChannel = (e: React.FormEvent) => {
@@ -136,7 +144,7 @@ export const AdminDashboard: React.FC = () => {
       bannerUrl: chanBannerUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
       linkUrl: chanLinkUrl,
       badge: chanBadge || 'Official Hub',
-      stats: chanStats || '10k+ Members',
+      stats: chanStats || 'Study Hub',
       videos: chanPlatform === 'youtube' ? [
         {
           id: `v_${Date.now()}_1`,
@@ -153,7 +161,7 @@ export const AdminDashboard: React.FC = () => {
     setChanDescription('');
     setChanLinkUrl('');
     setChanBannerUrl('');
-    alert('Media Channel & Hub published successfully!');
+    showNotification('Media Channel & Hub published successfully.');
   };
 
   return (
@@ -817,6 +825,14 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Floating Success Notification Toast */}
+      {successToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0" />
+          <span className="text-xs font-semibold">{successToast}</span>
         </div>
       )}
     </div>

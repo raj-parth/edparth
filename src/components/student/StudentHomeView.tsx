@@ -5,7 +5,6 @@ import { useApp } from '../../context/AppContext';
 import type { CBTExam } from '../../types';
 import { PomodoroWidget } from '../widgets/PomodoroWidget';
 import { FormulaFlashWidget } from '../widgets/FormulaFlashWidget';
-import { ParthAvatar } from '../ParthAvatar';
 
 interface StudentHomeViewProps {
   onStartExam: (exam: CBTExam) => void;
